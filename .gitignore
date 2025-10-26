@@ -1,0 +1,63 @@
+# =========================================
+# IGNORAR COMPILAÇÕES E BINÁRIOS
+# =========================================
+*.exe
+*.out
+*.o
+*.obj
+*.a
+*.so
+*.dll
+
+# =========================================
+# IGNORAR DIRETÓRIOS DE BUILD E OBJETOS
+# =========================================
+/bin/
+/build/
+/obj/
+/out/
+
+# =========================================
+# IGNORAR ARQUIVOS TEMPORÁRIOS DO SISTEMA
+# =========================================
+*.log
+*.tmp
+*.cache
+*.bak
+*.swp
+*.swo
+
+# =========================================
+# IGNORAR CONFIGURAÇÕES DO VSCODE
+# (mantém o projeto leve e sem arquivos pessoais)
+# =========================================
+.vscode/
+*.code-workspace
+
+# =========================================
+# IGNORAR BACKUPS E ARQUIVOS DO WINDOWS
+# =========================================
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# =========================================
+# IGNORAR ARQUIVOS DO GIT
+# =========================================
+*.orig
+*.rej
+
+# =========================================
+# IGNORAR ARQUIVOS DE TESTE OU DADOS TEMPORÁRIOS
+# =========================================
+/test/
+/temp/
+/data/
+
+# =========================================
+# IGNORAR COMPILAÇÕES AUTOMÁTICAS (MAKE, CMAKE)
+# =========================================
+Makefile.in
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
