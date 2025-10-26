@@ -1,0 +1,9 @@
+{
+    "C_Cpp.errorSquiggles": "enabled",
+    "files.associations": {
+        "dados.h": "c",
+        "stdio.h": "c",
+        "user.h": "c"
+    },
+    "makefile.makefilePath": ""
+}

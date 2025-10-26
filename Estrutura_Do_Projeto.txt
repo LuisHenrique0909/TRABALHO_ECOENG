@@ -1,0 +1,110 @@
+PROJETO_C – Estrutura do Projeto:
+
+SISTEMA_ECOENG/
+│
+├── src/
+│   ├── main.c
+│   ├── cadastro/
+│   │   ├── cadastro.h
+│   │   └── cadastro.c
+│   ├── cadastro_equipes/
+│   │   ├── cadastro_equipes.h
+│   │   └── cadastro_equipes.c
+│   ├── cadastro_user/
+│   │   ├── user.h
+│   │   └── user.c
+│   ├── desafio_robo/
+│   │   ├── pontuacao.h
+│   │   └── pontuacao.c
+│   ├── funcoes_csv/
+│   │   ├── dados.h
+│   │   └── dados.c
+│   ├── menus/
+│   │   ├── menu_principal.h
+│   │   ├── menu_principal.c
+│   │   ├── menu_avaliadores.h
+│   │   ├── menu_avaliadores.c
+│   │   ├── menu_equipes.h
+│   │   ├── menu_equipes.c
+│   │   ├── menu_profissoes.h
+│   │   └── menu_profissoes.c
+│   ├── utilidades/
+│   │   ├── files.h
+│   │   └── files.c
+│   └── resultados/
+│       ├── result.h
+│       └── result.c
+│
+├── dados/
+│   ├── equipes.csv
+│   └── users.csv
+│
+├── build/
+│   ├── main.o
+│   ├── cadastro/
+│   │   └── *.o
+│   ├── cadastro_equipes/
+│   │   └── *.o
+│   ├── cadastro_user/
+│   │   └── *.o
+│   ├── desafio_robo/
+│   │   └── *.o
+│   ├── funcoes_csv/
+│   │   └── *.o
+│   ├── menus/
+│   │   └── *.o
+│   ├── utilidades/
+│   │   └── *.o
+│   └── resultados/
+│       └── *.o
+│
+├── lib/
+│   └── (bibliotecas externas, se houver)
+│
+└── Makefile
+
+Descrição da Estrutura:
+1. src/
+Contém todo o código-fonte do projeto, organizado por módulos funcionais:
+main.c: ponto de entrada do programa
+cadastro/: módulo geral de cadastros
+cadastro_equipes/: funções específicas para cadastro de equipes
+cadastro_user/: funções para cadastro de usuários
+desafio_robo/: sistema de pontuação do desafio do robô
+funcoes_csv/: manipulação de arquivos CSV e dados
+menus/: todos os menus do sistema (principal, avaliadores, equipes, profissões)
+utilidades/: funções auxiliares e utilitárias
+resultados/: geração e exibição de resultados
+
+2. Arquivos .h e .c
+.h (headers): declarações de funções, structs, constantes e includes
+.c: implementações das funções declaradas nos headers
+
+3. dados/
+Contém arquivos CSV para armazenamento persistente:
+equipes.csv: dados das equipes cadastradas
+users.csv: dados dos usuários do sistema
+
+4. build/
+Diretório para arquivos objeto (.o) gerados durante a compilação, mantendo a mesma estrutura hierárquica do src/
+
+5. lib/
+Diretório para bibliotecas externas necessárias ao projeto
+
+6. Makefile
+Automatiza o processo de compilação:
+Compila arquivos .c em .o no diretório build/
+Gera o executável final
+Comandos: make (compilar), make clean (limpar arquivos temporários)
+
+Benefícios desta Estrutura:
+Organização Modular: Cada funcionalidade em seu próprio diretório
+Manutenibilidade: Fácil localização e modificação de código
+Escalabilidade: Simples adicionar novos módulos
+Separação Clara: Cabeçalhos e implementações bem organizados
+Compilação Eficiente: Makefile otimiza o processo de build
+Colaboração: Múltiplos desenvolvedores podem trabalhar sem conflitos
+
+
+
+
