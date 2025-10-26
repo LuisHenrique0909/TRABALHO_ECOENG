@@ -1,67 +1,54 @@
 PROJETO_C – Estrutura do Projeto:
 
-SISTEMA_ECOENG/
+TRABALHO_ECOENG/
 │
-├── src/
-│   ├── main.c
-│   ├── cadastro/
-│   │   ├── cadastro.h
-│   │   └── cadastro.c
-│   ├── cadastro_equipes/
-│   │   ├── cadastro_equipes.h
-│   │   └── cadastro_equipes.c
-│   ├── cadastro_user/
-│   │   ├── user.h
-│   │   └── user.c
-│   ├── desafio_robo/
-│   │   ├── pontuacao.h
-│   │   └── pontuacao.c
-│   ├── funcoes_csv/
-│   │   ├── dados.h
-│   │   └── dados.c
-│   ├── menus/
-│   │   ├── menu_principal.h
-│   │   ├── menu_principal.c
-│   │   ├── menu_avaliadores.h
-│   │   ├── menu_avaliadores.c
-│   │   ├── menu_equipes.h
-│   │   ├── menu_equipes.c
-│   │   ├── menu_profissoes.h
-│   │   └── menu_profissoes.c
-│   ├── utilidades/
-│   │   ├── files.h
-│   │   └── files.c
-│   └── resultados/
-│       ├── result.h
-│       └── result.c
+├── .vscode/                      # Configurações locais do VS Code
 │
-├── dados/
-│   ├── equipes.csv
-│   └── users.csv
+├── Arquivos_csv/                 # Base de dados do sistema (arquivos persistentes)
+│   ├── equipes.csv               # Dados das equipes cadastradas
+│   └── users.csv                 # Dados dos usuários (login/senha)
 │
-├── build/
-│   ├── main.o
-│   ├── cadastro/
-│   │   └── *.o
-│   ├── cadastro_equipes/
-│   │   └── *.o
-│   ├── cadastro_user/
-│   │   └── *.o
-│   ├── desafio_robo/
-│   │   └── *.o
-│   ├── funcoes_csv/
-│   │   └── *.o
-│   ├── menus/
-│   │   └── *.o
-│   ├── utilidades/
-│   │   └── *.o
-│   └── resultados/
-│       └── *.o
+├── bin/                          # Executáveis gerados pela compilação (make)
 │
-├── lib/
-│   └── (bibliotecas externas, se houver)
+├── Cadastro/                     # Módulos de cadastro do sistema
+│   ├── Cadastro_Equipes/
+│   │   ├── Cadastro_Equipes.c
+│   │   └── Cadastro_Equipes.h
+│   │
+│   └── Cadastro_user/
+│       ├── User.c
+│       └── User.h
 │
-└── Makefile
+├── Desafio_robo_Pontuacao/       # Módulo responsável por pontuações e desafios
+│   ├── Pontuacao.c
+│   └── Pontuacao.h
+│
+├── Funcoes_cvs/                  # Funções genéricas para manipulação de arquivos CSV
+│   ├── Dados.c
+│   └── Dados.h
+│
+├── lib/                          # (Reservado) possíveis bibliotecas externas ou estáticas
+│
+├── Menus/                        # Interface textual e interação com o usuário
+│   ├── Menu_Avaliadores/
+│   ├── Menu_Equipes/
+│   ├── Menu_principal/
+│   └── Menu_professores/
+│
+├── obj/                          # Objetos de compilação (.o)
+│
+├── Utilidades/                   # Funções auxiliares e ferramentas extras
+│   ├── FILES/
+│   └── Rsult/
+│
+├── .gitignore                    # Regras para ignorar arquivos desnecessários no Git
+│
+├── Estrutura_Do_Projeto.txt      # Documento explicando a organização dos módulos
+│
+├── main.c                        # Função principal do sistema (ponto de entrada)
+│
+└── makefile                      # Script de build automatizado
+
 
 Descrição da Estrutura:
 1. src/
