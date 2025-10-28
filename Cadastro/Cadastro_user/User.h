@@ -15,8 +15,11 @@ typedef enum {
 typedef struct {
     int id;
     char nome[50];
-    Cargo cargo;     // enum definido→ PARTICIPANTE, PROFESSOR_RESPONSAVEL, AVALIADOR
+    char cpf[20];
+    char gmail[100];
+    Cargo cargo;      // enum definido → ADMIN, PARTICIPANTE, PROFESSOR_RESPONSAVEL, AVALIADOR
     char senha[50];
+    int autorizado;   // 0 = aguardando aprovação, 1 = autorizado
 } User;
 
 // Validação de username e senha
@@ -30,15 +33,21 @@ int existe_nome(const char *username);
 void singin();
 Result cadastrar_user(User *u);
 
+// Autorização (somente admin)
+Result autorizar_user(int id);
+
 // Busca e listagem
 User* procura_user(int id);
 User* lista_users_por_cargo(Cargo cargo, int *quantidade);
 
-// Identificação de cargo por ID (nova função adicionada)
+// Identificação de cargo por ID (ou CPF)
 Cargo identificar_cargo_por_id(const char *id_texto);
 
-// Funções auxiliares para manipulação de cargos
+// Funções auxiliares
 const char* cargo_pra_texto(Cargo cargo);
 Cargo int_pra_cargo(int valor);
+
+// Inicialização automática do admin
+void inicializar_admin();
 
 #endif

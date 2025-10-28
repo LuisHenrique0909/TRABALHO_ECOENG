@@ -1,13 +1,13 @@
 #ifndef RESULT_H
 #define RESULT_H
 
-
 typedef enum {
     OK = 0,
     ERRO_LOGICA = -1,
     ERRO_ARQUIVO = -2,
     ERRO_MEMORIA = -3,
-    ERRO_INVALIDO = -4
+    ERRO_INVALIDO = -4,
+    ERRO_PERMISSAO = -5
 } Res;
 
 typedef struct {
