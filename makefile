@@ -1,81 +1,104 @@
-# Compilador e flags
+# ==========================
+# Makefile para TRABALHO_ECOENG
+# Compatível com Windows (CMD / PowerShell)
+# ==========================
+
+# Compilador
 CC = gcc
-AR = ar
-CFLAGS = -Wall -I. -ICadastro -ICadastro/Cadastro_Equipes -ICadastro/Cadastro_user -IResult -IDesafio_robo -IDesafio_robo/Pontuacao -IMenus -IMenus/Menu_Equipes -IMenus/Menu_Avaliadores -IMenus/Menu_professores -IMenus/Menu_principal -IFuncoes_cvs -IUtilidades -IUtilidades/FILES -g -std=c11
 
-# Diretórios
-OBJ_DIR = obj
+# Opções de compilação
+# -Wall: mostra todos os warnings
+# -g: adiciona informações de debug
+# -I<path>: adiciona diretórios onde o compilador deve procurar .h
+CFLAGS = -Wall -g \
+	-I. \
+	-ICadastro/Cadastro_Equipes \
+	-ICadastro/Cadastro_user \
+	-IDesafio_robo_Pontuacao \
+	-IFuncoes_cvs \
+	-IMenus/Menu_Equipes \
+	-IUtilidades/FILES \
+	-IUtilidades/Result
+
+# Pasta de build intermediária
+BUILD_DIR = build
+
+# Pasta de saída do executável
 BIN_DIR = bin
-LIB_DIR = lib
 
-# Executável principal
-TARGET = $(BIN_DIR)/SistemaEcoEng.exe
+# Nome do executável final
+TARGET = $(BIN_DIR)\ecoeng.exe
 
-# Fontes
-SRC_Cadastro = $(wildcard Cadastro/*.c Cadastro/Cadastro_Equipes/*.c Cadastro/Cadastro_user/*.c)
-SRC_Desafio_robo = $(wildcard Desafio_robo/Pontuacao/*.c)
-SRC_Menus = $(wildcard Menus/Menu_Equipes/*.c Menus/Menu_Avaliadores/*.c Menus/Menu_professores/*.c Menus/Menu_principal/*.c)
-SRC_Core = $(wildcard Funcoes_cvs/*.c Utilidades/FILES/*.c Result/*.c)
-SRC_MAIN = main.c
+# ==========================
+# Subpastas do projeto
+# ==========================
+DIRS = Cadastro/Cadastro_Equipes \
+       Cadastro/Cadastro_user \
+       Desafio_robo_Pontuacao \
+       Funcoes_cvs \
+       Menus/Menu_Equipes \
+       Utilidades/FILES \
+       Utilidades/Result
 
-# Objetos
-OBJ_Cadastro = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRC_Cadastro))
-OBJ_Desafio_robo = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRC_Desafio_robo))
-OBJ_Menus = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRC_Menus))
-OBJ_Core = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRC_Core))
-OBJ_MAIN = $(OBJ_DIR)/main.o
+# ==========================
+# Fontes e objetos
+# ==========================
+SRC = main.c \
+      $(wildcard Cadastro/Cadastro_Equipes/*.c) \
+      $(wildcard Cadastro/Cadastro_user/*.c) \
+      $(wildcard Desafio_robo_Pontuacao/*.c) \
+      $(wildcard Funcoes_cvs/*.c) \
+      $(wildcard Menus/Menu_Equipes/*.c) \
+      $(wildcard Utilidades/FILES/*.c) \
+      $(wildcard Utilidades/Result/*.c)
 
-# Bibliotecas estáticas
-LIB_Cadastro = $(LIB_DIR)/libCadastro.a
-LIB_Desafio_robo = $(LIB_DIR)/libDesafio_robo.a
-LIB_Menus = $(LIB_DIR)/libMenus.a
-LIB_Core = $(LIB_DIR)/libCore.a
+OBJ = $(patsubst %.c,$(BUILD_DIR)/%.o,$(SRC))
 
-# Dependências
-DEPENDS = $(OBJ_Cadastro:.o=.d) $(OBJ_Desafio_robo:.o=.d) $(OBJ_Menus:.o=.d) $(OBJ_Core:.o=.d) $(OBJ_MAIN:.o=.d)
+# ==========================
+# Alvo padrão
+# ==========================
+all: prepare $(TARGET)
 
-# --- Regras principais ---
-all: $(TARGET)
+# ==========================
+# Linkagem final
+# ==========================
+$(TARGET): $(OBJ)
+	@if not exist $(BIN_DIR) mkdir $(BIN_DIR)
+	$(CC) $(CFLAGS) -o $@ $^
 
-# Executável principal
-$(TARGET): $(LIB_Cadastro) $(LIB_Desafio_robo) $(LIB_Menus) $(LIB_Core) $(OBJ_MAIN)
-	@if not exist "$(BIN_DIR)" mkdir "$(BIN_DIR)"
-	$(CC) $(CFLAGS) "$(OBJ_MAIN)" "$(LIB_Cadastro)" "$(LIB_Desafio_robo)" "$(LIB_Menus)" "$(LIB_Core)" -o "$(TARGET)"
+# ==========================
+# Compilação dos .c em .o
+# ==========================
+$(BUILD_DIR)/%.o: %.c
+	@if not exist $(BUILD_DIR)\$(subst /,\,$(dir $@)) mkdir $(BUILD_DIR)\$(subst /,\,$(dir $@))
+	$(CC) $(CFLAGS) -c $< -o $@
 
-# Criar bibliotecas estáticas
-$(LIB_Cadastro): $(OBJ_Cadastro)
-	@if not exist "$(LIB_DIR)" mkdir "$(LIB_DIR)"
-	$(AR) rcs "$(LIB_Cadastro)" $(OBJ_Cadastro)
+# ==========================
+# Preparação das pastas
+# ==========================
+prepare:
+	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+	@if not exist $(BUILD_DIR)\Cadastro mkdir $(BUILD_DIR)\Cadastro
+	@if not exist $(BUILD_DIR)\Cadastro\Cadastro_Equipes mkdir $(BUILD_DIR)\Cadastro\Cadastro_Equipes
+	@if not exist $(BUILD_DIR)\Cadastro\Cadastro_user mkdir $(BUILD_DIR)\Cadastro\Cadastro_user
+	@if not exist $(BUILD_DIR)\Desafio_robo_Pontuacao mkdir $(BUILD_DIR)\Desafio_robo_Pontuacao
+	@if not exist $(BUILD_DIR)\Funcoes_cvs mkdir $(BUILD_DIR)\Funcoes_cvs
+	@if not exist $(BUILD_DIR)\Menus mkdir $(BUILD_DIR)\Menus
+	@if not exist $(BUILD_DIR)\Menus\Menu_Equipes mkdir $(BUILD_DIR)\Menus\Menu_Equipes
+	@if not exist $(BUILD_DIR)\Utilidades mkdir $(BUILD_DIR)\Utilidades
+	@if not exist $(BUILD_DIR)\Utilidades\FILES mkdir $(BUILD_DIR)\Utilidades\FILES
+	@if not exist $(BUILD_DIR)\Utilidades\Result mkdir $(BUILD_DIR)\Utilidades\Result
+	@if not exist $(BIN_DIR) mkdir $(BIN_DIR)
 
-$(LIB_Desafio_robo): $(OBJ_Desafio_robo)
-	@if not exist "$(LIB_DIR)" mkdir "$(LIB_DIR)"
-	$(AR) rcs "$(LIB_Desafio_robo)" $(OBJ_Desafio_robo)
-
-$(LIB_Menus): $(OBJ_Menus)
-	@if not exist "$(LIB_DIR)" mkdir "$(LIB_DIR)"
-	$(AR) rcs "$(LIB_Menus)" $(OBJ_Menus)
-
-$(LIB_Core): $(OBJ_Core)
-	@if not exist "$(LIB_DIR)" mkdir "$(LIB_DIR)"
-	$(AR) rcs "$(LIB_Core)" $(OBJ_Core)
-
-# Compilar objetos e gerar dependências
-$(OBJ_DIR)/%.o: %.c
-	@if not exist "$(dir $@)" mkdir "$(dir $@)"
-	$(CC) $(CFLAGS) -MMD -MP -c "$<" -o "$@"
-
-# Incluir dependências
--include $(DEPENDS)
-
-# Rodar executáveis
-run: $(TARGET)
-	"$(TARGET)"
-
+# ==========================
 # Limpeza
+# ==========================
 clean:
-	del /q "$(OBJ_DIR)\**\*.o" 2>nul
-	del /q "$(OBJ_DIR)\**\*.d" 2>nul
-	del /q "$(LIB_DIR)\*.a" 2>nul
-	del /q "$(BIN_DIR)\*.exe" 2>nul
+	@if exist $(BUILD_DIR) rd /S /Q $(BUILD_DIR)
+	@if exist $(TARGET) del $(TARGET)
 
-.PHONY: all clean run
+# ==========================
+# Executar o programa
+# ==========================
+run: all
+	./$(TARGET)

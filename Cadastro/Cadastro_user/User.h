@@ -1,7 +1,7 @@
 #ifndef User_H
 #define User_H
 
-#include "Utilidades/Rsult/Result.h"
+#include "Result.h"
 #include <stdio.h>
 
 typedef enum {
