@@ -1,36 +1,30 @@
-#ifndef Equipes_H
-#define Equipes_H
+#ifndef CADASTRO_EQUIPES_H
+#define CADASTRO_EQUIPES_H
 
-#include "../Cadastro_user/User.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "../../Cadastro/Cadastro_user/User.h"
+#include "../../Utilidades/FILES/Files.h"
+#include "../../Utilidades/Result/Result.h"
 
-// ==============================
-// ESTRUTURA PRINCIPAL
-// ==============================
+#define MAX_EQUIPE_NOME 100
+#define MAX_PARTICIPANTES 5
+
 typedef struct {
-    int id;
-    int id_Equipe;
-    int id_PROFESSOR_RESPONSAVEL;
-    char nome[50];
+    char nome[MAX_EQUIPE_NOME];
+    int ra_criador;
+    char nome_criador[50];
 } Equipe;
 
-// ==============================
-// FUNÇoES DE MENU
-// ==============================
-void menu_equipes(User *usuario_logado);
+// --- Funções principais ---
+Result cadastrar_equipe(User *usuario_logado);
+Result vincular_participante(User *usuario_logado);
+void listar_equipes(User *usuario_logado);
 
-// ==============================
-// FUNÇoES DE CADASTRO DE EQUIPE
-// ==============================
-int cadastrar_equipe(User *usuario_logado);
-int salvar_equipe( Equipe *e);
-int equipe_ja_existe(const char *nome);
-
-// ==============================
-// FUNÇÕES DE ViNCULO PARTICIPANTE-EQUIPE
-// ==============================
-void vincular_participante(User *usuario_logado);
-int coletar_vinculo_participante(int *id_equipe, int *id_user);
-int salvar_vinculo_participante(int id_equipe, int id_user);
-int participante_ja_vinculado(int id_user);
+// --- Funções auxiliares ---
+int participante_ja_vinculado(int ra);
+int criador_da_equipe(int ra);
+Equipe* buscar_equipe_por_ra(int ra);
 
 #endif

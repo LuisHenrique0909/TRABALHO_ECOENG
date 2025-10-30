@@ -1,7 +1,7 @@
 #include "User.h"
 #include "Dados.h"
-#include "Files.h"
 #include "Result.h"
+#include "Files.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -10,22 +10,20 @@
 
 #define MIN_USERNAME_LEN 4
 #define MAX_USERNAME_LEN 50
-
 #define MIN_SENHA_LEN 7
 #define MAX_SENHA_LEN 10
 
-// ------------------- Funções de Validação -------------------
+// ------------------- Validação -------------------
 
 int validar_username(const char *username) {
     int len = strlen(username);
     if (len < MIN_USERNAME_LEN || len > MAX_USERNAME_LEN) {
-        printf("O username deve ter entre %d e %d caracteres.\n",
-               MIN_USERNAME_LEN, MAX_USERNAME_LEN);
+        printf("O nome deve ter entre %d e %d caracteres.\n", MIN_USERNAME_LEN, MAX_USERNAME_LEN);
         return 0;
     }
     for (int i = 0; i < len; i++) {
-        if (!isalnum(username[i]) && username[i] != '_') {
-            printf("O username só pode conter letras, números ou '_'.\n");
+        if (!isalpha(username[i]) && username[i] != ' ') {
+            printf("O nome deve conter apenas letras e espaços.\n");
             return 0;
         }
     }
@@ -35,10 +33,12 @@ int validar_username(const char *username) {
 int validar_senha(const char *senha) {
     int len = strlen(senha);
     int tem_letra = 0, tem_numero = 0, tem_especial = 0;
+
     if (len < MIN_SENHA_LEN || len > MAX_SENHA_LEN) {
         printf("A senha deve ter entre %d e %d caracteres.\n", MIN_SENHA_LEN, MAX_SENHA_LEN);
         return 0;
     }
+
     for (int i = 0; i < len; i++) {
         if (isalpha(senha[i])) tem_letra = 1;
         else if (isdigit(senha[i])) tem_numero = 1;
@@ -48,29 +48,16 @@ int validar_senha(const char *senha) {
             return 0;
         }
     }
+
     if (!tem_letra || !tem_numero || !tem_especial) {
-        printf("A senha deve conter letra, número e caractere especial (!@#$%%&*_-+=.?).\n");
+        printf("A senha deve conter pelo menos uma letra, um número e um caractere especial (!@#$%%&*_-+=.?).\n");
         return 0;
     }
+
     return 1;
 }
 
-// ------------------- Funções de Identificação -------------------
-
-Cargo identificar_cargo_por_id(const char *id_texto) {
-    int len = strlen(id_texto);
-    if (len == 0) return PARTICIPANTE;
-    char ultimo = id_texto[len - 1];
-
-    for (int i = 0; i < len - 1; i++) {
-        if (!isdigit(id_texto[i])) return PARTICIPANTE;
-    }
-
-    if (isdigit(ultimo)) return PARTICIPANTE;
-    if (ultimo == 'P' || ultimo == 'p') return PROFESSOR_RESPONSAVEL;
-    if (ultimo == 'A' || ultimo == 'a') return AVALIADOR;
-    return PARTICIPANTE;
-}
+// ------------------- Utilitários -------------------
 
 const char* cargo_pra_texto(Cargo cargo) {
     switch (cargo) {
@@ -79,16 +66,6 @@ const char* cargo_pra_texto(Cargo cargo) {
         case PROFESSOR_RESPONSAVEL: return "Professor Responsável";
         case AVALIADOR: return "Avaliador";
         default: return "Desconhecido";
-    }
-}
-
-Cargo int_pra_cargo(int valor) {
-    switch (valor) {
-        case 0: return ADMIN;
-        case 1: return PARTICIPANTE;
-        case 2: return PROFESSOR_RESPONSAVEL;
-        case 3: return AVALIADOR;
-        default: return PARTICIPANTE;
     }
 }
 
@@ -121,43 +98,49 @@ void inicializar_admin() {
     }
 }
 
-// ------------------- Função principal de cadastro -------------------
+// ------------------- Cadastro -------------------
 
 void singin() {
     User u;
-    char id_ou_cpf[30];
+    int opcao;
     inicializar_admin();
 
-    printf("Digite o ID (RA) ou CPF: ");
-    fgets(id_ou_cpf, sizeof(id_ou_cpf), stdin);
-    id_ou_cpf[strcspn(id_ou_cpf, "\n")] = '\0';
+    printf("\nSelecione o cargo:\n");
+    printf("1 - Participante\n");
+    printf("2 - Professor Responsável\n");
+    printf("3 - Avaliador\n> ");
+    scanf("%d", &opcao);
+    getchar(); // limpa o \n
 
-    u.cargo = identificar_cargo_por_id(id_ou_cpf);
-    printf("Cargo identificado: %s\n", cargo_pra_texto(u.cargo));
-
-    if (u.cargo == PARTICIPANTE) {
-        strcpy(u.cpf, "");
-        u.id = atoi(id_ou_cpf);
-    } else {
-        strcpy(u.cpf, id_ou_cpf);
-        u.id = ultimo_id("users.csv") + 1;
+    switch (opcao) {
+        case 1: u.cargo = PARTICIPANTE; break;
+        case 2: u.cargo = PROFESSOR_RESPONSAVEL; break;
+        case 3: u.cargo = AVALIADOR; break;
+        default:
+            printf("Opção inválida. Cadastro cancelado.\n");
+            return;
     }
 
-    printf("Gmail: ");
-    fgets(u.gmail, sizeof(u.gmail), stdin);
-    u.gmail[strcspn(u.gmail, "\n")] = '\0';
+    printf("Nome completo: ");
+    fgets(u.nome, sizeof(u.nome), stdin);
+    u.nome[strcspn(u.nome, "\n")] = '\0';
 
     if (u.cargo == PARTICIPANTE) {
-        while (1) {
-            printf("Nome: ");
-            fgets(u.nome, sizeof(u.nome), stdin);
-            u.nome[strcspn(u.nome, "\n")] = '\0';
-            if (validar_username(u.nome)) break;
-        }
-    } else {
-        printf("Nome completo: ");
-        fgets(u.nome, sizeof(u.nome), stdin);
-        u.nome[strcspn(u.nome, "\n")] = '\0';
+        printf("Digite o RA (somente números): ");
+        scanf("%d", &u.id);
+        getchar();
+
+        printf("Gmail: ");
+        fgets(u.gmail, sizeof(u.gmail), stdin);
+        u.gmail[strcspn(u.gmail, "\n")] = '\0';
+        strcpy(u.cpf, ""); // não usa CPF
+    } 
+    else {
+        printf("Digite o CPF (somente números): ");
+        fgets(u.cpf, sizeof(u.cpf), stdin);
+        u.cpf[strcspn(u.cpf, "\n")] = '\0';
+        strcpy(u.gmail, ""); // não usa Gmail
+        u.id = ultimo_id("users.csv") + 1;
     }
 
     while (1) {
@@ -180,13 +163,11 @@ void singin() {
     }
 }
 
-// ------------------- Função de cadastro -------------------
+// ------------------- Gravação -------------------
 
 Result cadastrar_user(User *u) {
     FILE *f = escrever_no_csv("users.csv", "ID,NOME,CPF,GMAIL,CARGO,SENHA,AUTORIZADO\n");
-    if (!f) return erro(ERRO_ARQUIVO, "erro ao abrir users.csv");
-
-    if (existe_nome(u->nome)) return erro(ERRO_LOGICA, "Username já está em uso!");
+    if (!f) return erro(ERRO_ARQUIVO, "Erro ao abrir users.csv");
 
     fprintf(f, "%d,%s,%s,%s,%d,%s,%d\n",
             u->id, u->nome, u->cpf, u->gmail, u->cargo, u->senha, u->autorizado);
@@ -195,7 +176,7 @@ Result cadastrar_user(User *u) {
     return ok();
 }
 
-// ------------------- Função de autorização (somente admin) -------------------
+// ------------------- Autorização -------------------
 
 Result autorizar_user(int id) {
     char nome[50], senha[50];

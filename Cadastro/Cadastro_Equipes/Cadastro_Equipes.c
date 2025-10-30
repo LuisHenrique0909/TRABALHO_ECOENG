@@ -1,198 +1,184 @@
 #include "Cadastro_Equipes.h"
-#include "User.h"
-#include "Files.h"
-#include "Dados.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-// ==============================
-// CADASTRAR NOVA EQUIPE
-// ==============================
-int cadastrar_equipe(User *usuario_logado) {
-    if (!(usuario_logado->cargo == ADMIN)) {
-        printf("Acesso negado! Apenas ADMIN podem cadastrar equipes.\n");
-        return 0;
-    }
-
-    Equipe e;
-
-    FILE *f = escrever_no_csv("equipes.csv", "RA,ID_Equipe,ID_MENTOR,NOME_EQUIPE\n");
-    if (!f) {
-        printf("Erro ao abrir o arquivo de equipes.\n");
-        return 0;
-    }
-
-    printf("\nDigite o nome da equipe: ");
-    fgets(e.nome, sizeof(e.nome), stdin);
-    e.nome[strcspn(e.nome, "\n")] = '\0';
-
-    if (equipe_ja_existe(e.nome)) {
-        printf("Erro: já existe uma equipe com o nome '%s'.\n", e.nome);
-        fclose(f);
-        return 0;
-    }
-
-    printf("Digite o ID da Equipe: ");
-    scanf("%d", &e.id_Equipe);
-    getchar();
-
-    printf("Digite o ID do mentor: ");
-    scanf("%d", &e.id_PROFESSOR_RESPONSAVEL);
-    getchar();
-
-    // Validação usando identificar_cargo_por_id
-    char id_texto[20];
-    sprintf(id_texto, "%dP", e.id_PROFESSOR_RESPONSAVEL); // adiciona 'P' para simular ID de professor
-    if (identificar_cargo_por_id(id_texto) != PROFESSOR_RESPONSAVEL) {
-        printf("Erro: o ID %d não corresponde a um mentor válido.\n", e.id_PROFESSOR_RESPONSAVEL);
-        fclose(f);
-        return 0;
-    }
-
-    int ok = salvar_equipe(&e);
-    fclose(f);
-
-    if (ok) {
-        printf("Equipe '%s' cadastrada com sucesso! (ID: %d)\n", e.nome, e.id_Equipe);
-        return 1;
-    }
-
-    printf("Erro ao salvar equipe.\n");
-    return 0;
-}
-
-// ==============================
-// SALVAR EQUIPE NO CSV
-// ==============================
-int salvar_equipe(Equipe *e) {
-    FILE *f = escrever_no_csv("equipes.csv", "ID,ID_HACKATHON,ID_MENTOR,NOME_EQUIPE\n");
-    if (!f) return 0;
-
-    int ultimo = ultimo_id("equipes.csv");
-    if (ultimo < 0) return 0;
-
-    fprintf(f, "%d,%d,%d,%s\n", ultimo +1, e->id_Equipe, e->id_PROFESSOR_RESPONSAVEL, e->nome);
-    fclose(f);
-    return 1;
-}
-
-// ==============================
-// VERIFICAR DUPLICIDADE DE EQUIPE
-// ==============================
-int equipe_ja_existe(const char *nome) {
+// --------------------------------------------------
+// Verifica se o participante já está em alguma equipe
+// --------------------------------------------------
+int participante_ja_vinculado(int ra) {
     FILE *f = abrir_csv("equipes.csv");
     if (!f) return 0;
 
     char linha[256];
-    int id, id_hack, id_mentor;
-    char nome_existente[50];
+    fgets(linha, sizeof(linha), f); // cabeçalho
 
+    int ra_lido, ra_criador;
+    char nome_equipe[100], nome_criador[50];
     while (fgets(linha, sizeof(linha), f)) {
-        linha[strcspn(linha, "\n")] = '\0';
-        if (sscanf(linha, "%d,%d,%d,%49[^\n]", &id, &id_hack, &id_mentor, nome_existente) == 4) {
-            if (strcmp(nome_existente, nome) == 0) {
+        if (sscanf(linha, "%99[^,],%d,%49[^,],%d",
+                   nome_equipe, &ra_criador, nome_criador, &ra_lido) >= 2) {
+            if (ra == ra_criador || ra == ra_lido) {
                 fclose(f);
-                return 1;
+                return 1; // Já está em uma equipe
             }
         }
     }
-
     fclose(f);
     return 0;
 }
 
-// ==============================
-// PARTICIPANTE JA VINCULADO
-// ==============================
-int participante_ja_vinculado(int id_user) {
-    FILE *f = abrir_csv("user_equipe.csv");
+// --------------------------------------------------
+// Retorna 1 se o RA informado for criador de uma equipe
+// --------------------------------------------------
+int criador_da_equipe(int ra) {
+    FILE *f = abrir_csv("equipes.csv");
     if (!f) return 0;
 
-    char linha[100];
-    int id_equipe, id_part;
+    char linha[256];
+    fgets(linha, sizeof(linha), f);
+
+    char nome[100], nome_criador[50];
+    int ra_criador;
     while (fgets(linha, sizeof(linha), f)) {
-        if (sscanf(linha, "%d,%d", &id_equipe, &id_part) == 2) {
-            if (id_part == id_user) {
+        if (sscanf(linha, "%99[^,],%d,%49[^\n]", nome, &ra_criador, nome_criador) == 3) {
+            if (ra_criador == ra) {
                 fclose(f);
                 return 1;
             }
         }
     }
+
     fclose(f);
     return 0;
 }
 
-// ==============================
-// COLETAR DADOS PARA VINCULO
-// ==============================
-int coletar_vinculo_participante(int *id_equipe, int *id_user) {
-    printf("\n===== VINCULAR PARTICIPANTE =====\n");
+// --------------------------------------------------
+// Busca uma equipe pelo RA do criador
+// --------------------------------------------------
+Equipe* buscar_equipe_por_ra(int ra) {
+    FILE *f = abrir_csv("equipes.csv");
+    if (!f) return NULL;
 
-    printf("Digite o ID da equipe: ");
-    if (scanf("%d", id_equipe) != 1) {
-        int c; while ((c = getchar()) != '\n' && c != EOF) {}
-        return 0;
-    }
-    getchar();
+    static Equipe e;
+    char linha[256];
+    fgets(linha, sizeof(linha), f);
 
-    printf("Digite o ID do participante: ");
-    if (scanf("%d", id_user) != 1) {
-        int c; while ((c = getchar()) != '\n' && c != EOF) {}
-        return 0;
-    }
-    getchar();
-
-    // Validação usando identificar_cargo_por_id
-    char id_texto[20];
-    sprintf(id_texto, "%d", *id_user); // apenas números → PARTICIPANTE
-    if (identificar_cargo_por_id(id_texto) != PARTICIPANTE) {
-        printf("Erro: o ID %d não pertence a um participante válido.\n", *id_user);
-        return 0;
+    while (fgets(linha, sizeof(linha), f)) {
+        if (sscanf(linha, "%99[^,],%d,%49[^\n]", e.nome, &e.ra_criador, e.nome_criador) == 3) {
+            if (e.ra_criador == ra) {
+                fclose(f);
+                return &e;
+            }
+        }
     }
 
-    if (participante_ja_vinculado(*id_user)) {
-        printf("Erro: o participante %d já está vinculado a uma equipe.\n", *id_user);
-        return 0;
-    }
-
-    return 1;
-}
-
-// ==============================
-// SALVAR VINCULO PARTICIPANTE EQUIPE
-// ==============================
-int salvar_vinculo_participante(int id_equipe, int id_user) {
-    FILE *f = escrever_no_csv("user_equipe.csv", "ID_EQUIPE,ID_PARTICIPANTE\n");
-    if (!f) {
-        printf("Erro ao abrir user_equipe.csv\n");
-        return 0;
-    }
-
-    fprintf(f, "%d,%d\n", id_equipe, id_user);
     fclose(f);
-    return 1;
+    return NULL;
 }
 
-// ==============================
-// CONTROLADOR: VINCULAR PARTICIPANTE
-// ==============================
-void vincular_participante(User *usuario_logado) {
-    if (!(usuario_logado->cargo == ADMIN)) {
-        printf("Acesso negado! Apenas ADMIN podem vincular participantes.\n");
+// --------------------------------------------------
+// Cadastrar nova equipe
+// --------------------------------------------------
+Result cadastrar_equipe(User *usuario_logado) {
+    if (!usuario_logado) return erro(ERRO_LOGICA, "Usuário não está logado.");
+
+    if (usuario_logado->cargo != PARTICIPANTE)
+        return erro(ERRO_PERMISSAO, "Somente PARTICIPANTES podem cadastrar equipes.");
+
+    if (participante_ja_vinculado(usuario_logado->id))
+        return erro(ERRO_LOGICA, "Você já faz parte de uma equipe e não pode criar outra.");
+
+    char nome_equipe[MAX_EQUIPE_NOME];
+    printf("\n--- CADASTRO DE EQUIPE ---\n");
+    printf("Digite o nome da equipe: ");
+    fgets(nome_equipe, sizeof(nome_equipe), stdin);
+    nome_equipe[strcspn(nome_equipe, "\n")] = '\0';
+
+    FILE *f = escrever_no_csv("equipes.csv", "NOME_EQUIPE,RA_CRIADOR,NOME_CRIADOR\n");
+    if (!f) return erro(ERRO_ARQUIVO, "Erro ao abrir equipes.csv");
+
+    fprintf(f, "%s,%d,%s\n", nome_equipe, usuario_logado->id, usuario_logado->nome);
+    fclose(f);
+
+    printf("\nEquipe '%s' cadastrada com sucesso!\n", nome_equipe);
+    printf("Você é o criador da equipe.\n");
+    printf("Apenas você poderá adicionar ou remover participantes.\n");
+
+    return ok();
+}
+
+// --------------------------------------------------
+// Vincular participante a uma equipe (apenas criador)
+// --------------------------------------------------
+Result vincular_participante(User *usuario_logado) {
+    if (!usuario_logado) return erro(ERRO_LOGICA, "Usuário não está logado.");
+
+    if (usuario_logado->cargo != PARTICIPANTE)
+        return erro(ERRO_PERMISSAO, "Somente PARTICIPANTES podem vincular outros participantes.");
+
+    if (!criador_da_equipe(usuario_logado->id)) {
+        printf("\nVocê não é criador de nenhuma equipe.\n");
+        printf("Você só pode visualizar a equipe da qual participa.\n\n");
+        listar_equipes(usuario_logado);
+        return ok();
+    }
+
+    Equipe *eq = buscar_equipe_por_ra(usuario_logado->id);
+    if (!eq) return erro(ERRO_LOGICA, "Erro ao localizar sua equipe.");
+
+    int ra_novo;
+    printf("\n--- ADICIONAR PARTICIPANTE ---\n");
+    printf("Equipe: %s\n", eq->nome);
+    printf("Digite o RA do participante que deseja adicionar: ");
+    scanf("%d", &ra_novo);
+    getchar();
+
+    if (participante_ja_vinculado(ra_novo))
+        return erro(ERRO_LOGICA, "Esse participante já está vinculado a uma equipe.");
+
+    FILE *f = fopen("equipes.csv", "a");
+    if (!f) return erro(ERRO_ARQUIVO, "Erro ao abrir equipes.csv para vincular participante.");
+
+    fprintf(f, "%s,%d,%s,%d\n", eq->nome, eq->ra_criador, eq->nome_criador, ra_novo);
+    fclose(f);
+
+    printf("Participante RA %d adicionado à equipe '%s'.\n", ra_novo, eq->nome);
+    return ok();
+}
+
+// --------------------------------------------------
+// Listar equipes do participante
+// --------------------------------------------------
+void listar_equipes(User *usuario_logado) {
+    if (!usuario_logado) {
+        printf("Usuário não logado.\n");
         return;
     }
 
-    int id_equipe, id_user;
-    if (!coletar_vinculo_participante(&id_equipe, &id_user)) {
-        printf("Falha na coleta dos dados do vínculo.\n");
+    FILE *f = abrir_csv("equipes.csv");
+    if (!f) {
+        printf("Nenhuma equipe cadastrada.\n");
         return;
     }
 
-    if (salvar_vinculo_participante(id_equipe, id_user)) {
-        printf("Participante %d vinculado com sucesso à equipe %d!\n", id_user, id_equipe);
-    } else {
-        printf("Erro ao salvar vínculo no arquivo CSV.\n");
+    char linha[256];
+    fgets(linha, sizeof(linha), f);
+
+    int encontrou = 0;
+    char nome[100], nome_criador[50];
+    int ra_criador, ra_vinculado;
+
+    printf("\n--- SUAS EQUIPES ---\n");
+
+    while (fgets(linha, sizeof(linha), f)) {
+        int campos = sscanf(linha, "%99[^,],%d,%49[^,],%d", nome, &ra_criador, nome_criador, &ra_vinculado);
+
+        if (campos >= 3 && (ra_criador == usuario_logado->id || ra_vinculado == usuario_logado->id)) {
+            printf("Equipe: %s | Criador: %s (RA: %d)\n", nome, nome_criador, ra_criador);
+            encontrou = 1;
+        }
     }
+
+    if (!encontrou)
+        printf("Você não está vinculado a nenhuma equipe.\n");
+
+    fclose(f);
 }
