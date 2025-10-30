@@ -1,4 +1,6 @@
 #include "Cadastro_Equipes.h"
+#include "Dados.h"
+#include "Files.h"
 
 // --------------------------------------------------
 // Verifica se o participante já está em alguma equipe
