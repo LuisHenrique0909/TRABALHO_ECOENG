@@ -12,7 +12,7 @@ typedef enum {
 
 typedef struct {
     Res code;
-    char *msg;
+    const char *msg;  // <- const aqui
 } Result;
 
 // Retorno de sucesso (sem mensagem)
