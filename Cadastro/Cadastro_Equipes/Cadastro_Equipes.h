@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../../Cadastro/Cadastro_user/User.h"
-#include "../../Utilidades/FILES/Files.h"
 #include "../../Utilidades/Result/Result.h"
 
 #define MAX_EQUIPE_NOME 100

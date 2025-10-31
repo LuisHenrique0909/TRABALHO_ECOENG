@@ -1,7 +1,6 @@
 #include "User.h"
 #include "Dados.h"
 #include "Result.h"
-#include "Files.h"
 
 #include <stdio.h>
 #include <string.h>
