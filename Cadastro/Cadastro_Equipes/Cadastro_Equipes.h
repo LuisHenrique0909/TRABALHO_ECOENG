@@ -4,26 +4,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../Cadastro/Cadastro_user/User.h"
-#include "../../Utilidades/Result/Result.h"
-
-#define MAX_EQUIPE_NOME 100
-#define MAX_PARTICIPANTES 5
+#include "User.h"
+#include "Result.h"
 
 typedef struct {
-    char nome[MAX_EQUIPE_NOME];
-    int ra_criador;
+    int id_equipe;
+    char nome[100];
     char nome_criador[50];
+    char nomes_participantes[200];
 } Equipe;
 
-// --- Funções principais ---
 Result cadastrar_equipe(User *usuario_logado);
-Result vincular_participante(User *usuario_logado);
-void listar_equipes(User *usuario_logado);
-
-// --- Funções auxiliares ---
-int participante_ja_vinculado(int ra);
-int criador_da_equipe(int ra);
-Equipe* buscar_equipe_por_ra(int ra);
+Result adicionar_participante(User *usuario_logado);
+Result remover_participante(User *usuario_logado);
+void exibir_equipe_do_participante(User *usuario_logado);
+void listar_equipes();
 
 #endif

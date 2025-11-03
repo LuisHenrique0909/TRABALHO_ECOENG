@@ -1,102 +1,111 @@
-# 🌱 Sistema ECOENG
+TRABALHO_ECOENG
 
-Sistema desenvolvido como trabalho acadêmico para a disciplina de Engenharia de Software / Projeto Integrador.  
-O objetivo é simular o funcionamento de um sistema de **gerenciamento para o evento ECOENG**, aplicando conceitos de **modularização em C**, **persistência de dados** e **organização de código com Makefile**.
+Projeto desenvolvido para o trabalho da disciplina de EEstrutura de Dados, com foco na criação de um sistema modular em linguagem C, organizado em múltiplos menus e funcionalidades específicas para o gerenciamento de equipes, usuários e resultados de um desafio de robótica.
 
----
-
-## 🧩 Estrutura do Projeto
+📂 Estrutura do Projeto
+Abaixo está a organização principal do projeto conforme a estrutura de pastas:
 
 TRABALHO_ECOENG/
 │
-├── .vscode/                      # Configurações locais do VS Code
+├── bin/                        # Pasta para os arquivos compilados
 │
-├── Arquivos_csv/                 # Base de dados do sistema (arquivos persistentes)
-│   ├── equipes.csv               # Dados das equipes cadastradas
-│   └── users.csv                 # Dados dos usuários (login/senha)
+├── Cadastro/
+│   ├── Cadastro_Equipes/       # Módulo de cadastro de equipes
+│   └── Cadastro_user/          # Módulo de cadastro de usuários
 │
-├── bin/                          # Executáveis gerados pela compilação (make)
+├── dados/                      # Base de dados em CSV
+│   ├── equipes.csv
+│   ├── resultados_robo.csv
+│   └── users.csv
 │
-├── Cadastro/                     # Módulos de cadastro do sistema
-│   ├── Cadastro_Equipes/
-│   │   ├── Cadastro_Equipes.c
-│   │   └── Cadastro_Equipes.h
+├── Desafio_robo/               # Lógica e dados relacionados ao desafio de robôs
+│
+├── Funcoes_admin/              # Funções administrativas e de controle
+│
+├── Menus/                      # Menus principais do sistema
+│   ├── Menu_avaliador/
+│   │   ├── Menu_avaliador.c
+│   │   └── Menu_avaliador.h
 │   │
-│   └── Cadastro_user/
-│       ├── User.c
-│       └── User.h
-│
-├── Desafio_robo_Pontuacao/       # Módulo responsável por pontuações e desafios
-│   ├── Pontuacao.c
-│   └── Pontuacao.h
-│
-├── Funcoes_cvs/                  # Funções genéricas para manipulação de arquivos CSV
-│   ├── Dados.c
-│   └── Dados.h
-│
-├── lib/                          # (Reservado) possíveis bibliotecas externas ou estáticas
-│
-├── Menus/                        # Interface textual e interação com o usuário
-│   ├── Menu_Avaliadores/
 │   ├── Menu_Equipes/
-│   ├── Menu_principal/
-│   └── Menu_professores/
+│   │   ├── Menu_Equipes.c
+│   │   └── Menu_Equipes.h
+│   │
+│   ├── Menu_Ranking/
+│   │   ├── Ranking.c
+│   │   └── Ranking.h
+│   │
+│   ├── Menu_principal/         # Menu inicial e navegação geral
+│   
 │
-├── obj/                          # Objetos de compilação (.o)
+├── Utilidades/                 # Funções auxiliares reutilizáveis
+│   ├── files/
+│   │   ├── files.c
+│   │   └── files.h
+│   │
+│   └── Result/
+│       ├── Result.c
+│       └── Result.h
 │
-├── Utilidades/                   # Funções auxiliares e ferramentas extras
-│   ├── FILES/
-│   └── Rsult/
-│
-├── .gitignore                    # Regras para ignorar arquivos desnecessários no Git
-│
-├── Estrutura_Do_Projeto.txt      # Documento explicando a organização dos módulos
-│
-├── main.c                        # Função principal do sistema (ponto de entrada)
-│
-└── makefile                      # Script de build automatizado
+├── .gitignore                  # Arquivos ignorados pelo Git
+├── main.c                      # Ponto de entrada do programa
+├── makefile                    # Script de compilação
+└── README.md                   # Documentação do projeto
 
+🧩 Descrição dos Módulos
+🟢 Cadastro
+Contém os módulos responsáveis por cadastrar equipes e usuários.
+Cadastro_Equipes: gerencia o registro e edição das equipes participantes.
+Cadastro_user: gerencia o cadastro e autenticação dos usuários.
 
----
+📊 dados
+Contém os arquivos .csv usados como base de dados do sistema.
+Eles armazenam informações persistentes como:
+equipes.csv → dados das equipes
+resultados_robo.csv → pontuações e desempenho
+users.csv → usuários cadastrados
 
-## ⚙️ Compilação e Execução
+⚙️ Funcoes_admin
+Módulo de funções administrativas, permitindo controle e manutenção dos registros.
 
-### 🧱 Pré-requisitos
-- [GCC (MinGW)](https://www.mingw-w64.org/) ou outro compilador C
-- [Make](https://gnuwin32.sourceforge.net/packages/make.htm)
-- [VS Code](https://code.visualstudio.com/) com a extensão **C/C++** da Microsoft instalada
+🧭 Menus
+Contém a interface textual do sistema, dividida em módulos:
+Menu_principal: menu inicial e controle de fluxo.
+Menu_Equipes: opções de gerenciamento de equipes.
+Menu_avaliador: menu destinado aos avaliadores.
+Menu_Ranking: exibe e organiza o ranking das equipes.
+fluxograma.txt: documentação com o fluxo lógico das telas e menus.
 
----
+🧰 Utilidades
+Funções de suporte utilizadas em diversos módulos:
+files: leitura e escrita de arquivos .csv
+Result: manipulação de resultados e cálculos de pontuação.
 
-### 🚀 Compilar o projeto
-No terminal do VS Code (dentro da pasta `TRABALHO_ECOENG`):
+⚡ Como Compilar
 
-```bash
-make
-Isso criará os arquivos objeto em obj/ e o executável em bin/.
+O projeto usa um Makefile para facilitar a compilação.
+No terminal, dentro da pasta principal do projeto, execute: make
+Isso irá compilar todos os arquivos .c e gerar o executável na pasta bin/.
 
-▶️ Executar o sistema
-Após compilar, execute:
-./bin/sistema_ecoeng.exe
-(ou apenas sistema_ecoeng.exe se estiver na raiz do projeto)
+Para limpar os arquivos compilados: make clean
 
-🧹 Limpar arquivos de compilação
-Para remover os objetos e recompilar do zero:
-make clean
+▶️ Como Executar
+Após compilar, execute o programa principal: ./bin/TRABALHO_ECOENG
 
-🧠 Conceitos Aplicados
-Modularização de código em C
-Manipulação e leitura de arquivos CSV
-Persistência de dados sem banco de dados relacional
-Sistema de cadastro, login e pontuação
-Organização de projeto com Makefile
-Boas práticas de versionamento com Git e GitHub
+👨‍💻 Tecnologias Utilizadas
+Linguagem: C
+Compilador: GCC
+Organização: Estrutura modular com cabeçalhos (.h) e implementações (.c)
+Persistência: Arquivos .csv
 
-👨‍💻 Autor
-Luis Henrique (Henrique)
-🎓 Estudante de Engenharia de Software — FUCAPI
-🔗 GitHub - @LuisHenrique0909
+🧠 Objetivo do Projeto
+O sistema tem como objetivo simular o gerenciamento de um Desafio de Robótica, permitindo:
+Cadastro e controle de equipes;
+Avaliação de desempenho;
+Exibição de rankings;
+Administração de usuários e resultados.
 
-🧾 Licença
-Este projeto é de uso educacional.
-Você pode estudar, modificar e reutilizar o código, desde que mantenha os devidos créditos.
+🧾 Autor
+Nome: Luis Henrique
+Curso: Engenharia de Software
+Instituição: FUCAPI
