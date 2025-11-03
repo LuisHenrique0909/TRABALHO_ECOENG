@@ -1,6 +1,6 @@
 #include "Files.h"
 
-// ------------------ Verificar existência de arquivo ------------------
+// ------------------ Verifica se existe arquivo ------------------
 int arquivo_existe(const char *arquivo) {
     char caminho[256];
     snprintf(caminho, sizeof(caminho), "%s%s", DATA_DIR, arquivo);
@@ -21,7 +21,7 @@ FILE *abrir_csv(const char *arquivo) {
     return f;
 }
 
-// ------------------ Escrever em CSV ------------------
+// ------------------ Escrever no CSV ------------------
 FILE *escrever_no_csv(const char *arquivo, const char *header) {
     char caminho[256];
     snprintf(caminho, sizeof(caminho), "%s%s", DATA_DIR, arquivo);
