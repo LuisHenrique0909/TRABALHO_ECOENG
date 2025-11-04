@@ -3,7 +3,7 @@
 
 #include "Desafio_robo.h"
 
-// Menu principal para o avaliador do evento
+// Menu principal para o avaliador
 void menu_avaliador();
 
 #endif

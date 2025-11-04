@@ -4,12 +4,14 @@
 #include "Result.h"
 #include <stdio.h>
 
+// Enum de cargos
 typedef enum {
     ADMIN = 0,
     PARTICIPANTE = 1,
     AVALIADOR = 2
 } Cargo;
 
+// Estrutura principal do usuário
 typedef struct {
     int id;
     char nome[50];
@@ -17,13 +19,16 @@ typedef struct {
     char senha[50];
 } User;
 
-// Cadastro e login
-void singin();
-Result cadastrar_user(User *u);
-User* login_user();
+// Funções principais
+void singin();                   // Cadastro de participante
+Result cadastrar_user(User *u);  // Salva usuário no CSV
+User* login_user();              // Realiza login e retorna struct alocada
 
-// Usuários padrões
+// Usuários padrão
 void inicializar_admin();
 void inicializar_avaliador();
+
+// Utilitários
+const char* cargo_pra_texto(Cargo cargo);
 
 #endif

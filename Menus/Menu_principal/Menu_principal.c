@@ -1,7 +1,7 @@
 #include "User.h"
 #include "Menu_Equipes.h"
 #include "Menu_Avaliador.h"
-#include "F_admin.h"
+#include "Menu_Admin.h"
 #include "Files.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,7 +41,7 @@ void menu_principal() {
         getchar();
 
         if (resp == 's' || resp == 'S') {
-            singin(); // cadastro automático
+            singin(); // Cadastro automático
             printf("\nCadastro realizado! Faça login novamente.\n");
         } else {
             printf("Voltando ao menu principal...\n");
