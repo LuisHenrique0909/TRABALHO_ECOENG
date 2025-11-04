@@ -1,50 +1,72 @@
-#include "Menu_Principal.h"
-#include "Menu_Avaliador.h"
+#include "User.h"
 #include "Menu_Equipes.h"
+#include "Menu_Avaliador.h"
+#include "F_admin.h"
 #include "Files.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-// =================== MENU PRINCIPAL ===================
+// ========================== LOGIN E MENU PRINCIPAL ==========================
 
 void menu_principal() {
-    printf("=========================================\n");
-    printf("      SISTEMA DE GERENCIAMENTO ECOENG    \n");
-    printf("=========================================\n");
-
-    // Inicializa usuários padrão (Admin e Avaliador)
     inicializar_admin();
     inicializar_avaliador();
 
-    printf("\nPor favor, realize o login para continuar.\n");
+    printf("\n===== SISTEMA DE GERENCIAMENTO DO EVENTO ECOENG =====\n");
+    printf("1 - Fazer login\n");
+    printf("0 - Sair\n");
+    printf("Escolha: ");
 
-    // Realiza login
-    User *usuario_logado = login_user();
-    if (!usuario_logado) {
-        printf("\nFalha no login. Encerrando o sistema...\n");
+    int opc;
+    scanf("%d", &opc);
+    getchar();
+
+    if (opc == 0) {
+        printf("Encerrando sistema...\n");
         return;
     }
 
-    printf("\nBem-vindo, %s!\n", usuario_logado->nome);
-    printf("Cargo: %s\n", cargo_pra_texto(usuario_logado->cargo));
+    if (opc != 1) {
+        printf("Opção inválida.\n");
+        return menu_principal();
+    }
 
-    // Redireciona conforme o cargo do usuário
-    switch (usuario_logado->cargo) {
+    User *usuario = login_user();
+    if (!usuario) {
+        printf("\nUsuário não encontrado.\n");
+        printf("Deseja se cadastrar como PARTICIPANTE? (s/n): ");
+        char resp;
+        scanf(" %c", &resp);
+        getchar();
+
+        if (resp == 's' || resp == 'S') {
+            singin(); // cadastro automático
+            printf("\nCadastro realizado! Faça login novamente.\n");
+        } else {
+            printf("Voltando ao menu principal...\n");
+        }
+
+        return menu_principal();
+    }
+
+    printf("\nBem-vindo(a), %s! Cargo: %s\n", usuario->nome, cargo_pra_texto(usuario->cargo));
+
+    // Redirecionamento conforme cargo
+    switch (usuario->cargo) {
         case ADMIN:
-            printf("\n Menu do ADMIN ainda em desenvolvimento.\n");
+            menu_admin();
             break;
         case AVALIADOR:
             menu_avaliador();
             break;
         case PARTICIPANTE:
-            menu_equipe(usuario_logado);
+            menu_equipe(usuario);
             break;
         default:
-            printf("Erro: tipo de usuário desconhecido.\n");
+            printf("Cargo inválido. Encerrando sessão.\n");
+            break;
     }
 
-    // Libera memória
-    free(usuario_logado);
-
-    printf("\nSessão encerrada. Obrigado por usar o sistema!\n");
+    free(usuario);
 }
