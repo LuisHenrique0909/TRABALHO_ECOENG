@@ -6,10 +6,11 @@
 // Menu principal do administrador
 void menu_admin();
 
-// Funções auxiliares de controle administrativo
+// Funções auxiliares específicas do admin
 void listar_todos_usuarios();
 void deletar_usuario();
 void listar_todas_equipes();
 void deletar_equipe();
+void alterar_pontuacao_equipe();
 
-#endif 
+#endif

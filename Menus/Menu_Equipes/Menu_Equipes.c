@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+// ================================================================
+// Menu principal do participante
+// ================================================================
 void menu_equipe(User *usuario) {
     if (!usuario) {
         printf("Erro: usuário não logado.\n");
@@ -56,32 +59,64 @@ void menu_equipe(User *usuario) {
 // Mostra a pontuação da equipe logada (dados do CSV de resultados)
 // ================================================================
 void mostrar_pontuacao_da_equipe(User *usuario) {
-    FILE *f = abrir_csv("resultados_robo.csv");
-    if (!f) {
+    FILE *f_eq = abrir_csv("equipes.csv");
+    if (!f_eq) {
+        printf("Nenhuma equipe cadastrada.\n");
+        return;
+    }
+
+    char linha_eq[512];
+    fgets(linha_eq, sizeof(linha_eq), f_eq);
+
+    char nome_equipe[100] = "";
+    int id_equipe = -1;
+
+    // Busca a equipe em que o participante está
+    while (fgets(linha_eq, sizeof(linha_eq), f_eq)) {
+        int id;
+        char nome_eq[100], criador[50], nomes[200];
+        if (sscanf(linha_eq, "%d,%99[^,],%49[^,],%199[^\n]", &id, nome_eq, criador, nomes) == 4) {
+            if (strstr(nomes, usuario->nome)) {
+                strcpy(nome_equipe, nome_eq);
+                id_equipe = id;
+                break;
+            }
+        }
+    }
+    fclose(f_eq);
+
+    if (id_equipe == -1) {
+        printf("\nVocê ainda não faz parte de nenhuma equipe.\n");
+        return;
+    }
+
+    FILE *f_res = abrir_csv("resultados_robo.csv");
+    if (!f_res) {
         printf("Nenhuma pontuação registrada ainda.\n");
         return;
     }
 
     char linha[512];
-    fgets(linha, sizeof(linha), f);
+    fgets(linha, sizeof(linha), f_res);
 
-    char nome_equipe[100];
+    int id;
+    char nome_csv[100], tipo[50];
     float tempo;
-    int pontos, id;
-    char tipo[50];
+    int pontos;
     int encontrou = 0;
 
-    while (fgets(linha, sizeof(linha), f)) {
-        sscanf(linha, "%d,%99[^,],%49[^,],%f,%d", &id, nome_equipe, tipo, &tempo, &pontos);
-        if (strstr(nome_equipe, usuario->nome)) {
-            printf("\n--- Pontuação da sua equipe (%s) ---\n", nome_equipe);
-            printf("Desafio: %s\nTempo: %.2f s\nPontos: %d\n", tipo, tempo, pontos);
-            encontrou = 1;
+    printf("\n--- PONTUAÇÃO DA SUA EQUIPE (%s) ---\n", nome_equipe);
+    while (fgets(linha, sizeof(linha), f_res)) {
+        if (sscanf(linha, "%d,%99[^,],%49[^,],%f,%d", &id, nome_csv, tipo, &tempo, &pontos) == 5) {
+            if (strcmp(nome_csv, nome_equipe) == 0) {
+                printf("Desafio: %s | Tempo: %.2f s | Pontos: %d\n", tipo, tempo, pontos);
+                encontrou = 1;
+            }
         }
     }
 
-    fclose(f);
-
     if (!encontrou)
-        printf("\nSua equipe ainda não tem pontuação registrada.\n");
+        printf("Esta equipe ainda não possui pontuação registrada.\n");
+
+    fclose(f_res);
 }

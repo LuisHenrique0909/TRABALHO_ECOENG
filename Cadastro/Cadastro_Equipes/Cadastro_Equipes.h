@@ -4,23 +4,21 @@
 #include "Result.h"
 #include "User.h"
 
-// Estrutura principal da equipe
+// Estrutura de equipe
 typedef struct {
-    int id;
-    char nome[100];
-    char criador[50];
-    char participantes[300];
+    int id_equipe;
+    char nome_equipe[100];
+    char nome_lider[100];
+    char participantes[300]; // nomes dos integrantes separados por ';'
 } Equipe;
 
 // Funções principais
 Result cadastrar_equipe(User *lider);
+Result adicionar_participante_equipe(const char *nome_equipe, const char *nome_participante);
+Result remover_participante_equipe(const char *nome_equipe, const char *nome_participante);
 void listar_equipes();
-void listar_todas_equipes(); // para o admin
 void exibir_equipe_do_participante(User *usuario);
-void adicionar_participante(User *lider);
-void remover_participante(User *lider);
-int participante_ja_tem_equipe(const char *nome_participante);
-int buscar_equipe_por_nome(const char *nome);
-int ultimo_id_equipe();
+int equipe_existe(const char *nome_equipe);
+int participante_em_alguma_equipe(const char *nome_participante);
 
 #endif

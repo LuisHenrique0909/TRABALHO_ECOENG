@@ -1,23 +1,24 @@
 #include "Menu_Admin.h"
 #include "Files.h"
-#include "Cadastro_Equipes.h"
+#include "Pontuacao.h"
 #include "Ranking.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// ================================================================
-// Menu do administrador
-// ================================================================
+// ============================================================================
+// Função principal do menu do administrador
+// ============================================================================
 void menu_admin() {
     int opc;
     do {
         printf("\n===== MENU ADMINISTRADOR =====\n");
-        printf("1 - Listar usuários\n");
+        printf("1 - Listar todos os usuários\n");
         printf("2 - Deletar usuário\n");
-        printf("3 - Listar equipes\n");
+        printf("3 - Listar todas as equipes\n");
         printf("4 - Deletar equipe\n");
-        printf("5 - Ver ranking geral\n");
+        printf("5 - Alterar pontuação de equipe\n");
+        printf("6 - Visualizar ranking geral\n");
         printf("0 - Sair\n");
         printf("Escolha: ");
         scanf("%d", &opc);
@@ -28,108 +29,183 @@ void menu_admin() {
             case 2: deletar_usuario(); break;
             case 3: listar_todas_equipes(); break;
             case 4: deletar_equipe(); break;
-            case 5: menu_ranking(); break;
-            case 0: printf("Saindo do menu administrador...\n"); break;
+            case 5: alterar_pontuacao_equipe(); break;
+            case 6: menu_ranking(); break;
+            case 0: printf("Saindo do menu do administrador...\n"); break;
             default: printf("Opção inválida.\n");
         }
     } while (opc != 0);
 }
 
-// ================================================================
-// Lista todos os usuários registrados no sistema
-// ================================================================
+// ============================================================================
+// 1. Listar todos os usuários
+// ============================================================================
 void listar_todos_usuarios() {
     FILE *f = abrir_csv("users.csv");
     if (!f) {
-        printf("Nenhum usuário cadastrado.\n");
+        printf("Nenhum usuário encontrado.\n");
         return;
     }
 
     char linha[256];
     fgets(linha, sizeof(linha), f);
-    printf("\n--- LISTA DE USUÁRIOS ---\n");
-    printf("%-5s %-25s %-10s\n", "ID", "Nome", "Cargo");
+
+    printf("\n--- USUÁRIOS CADASTRADOS ---\n");
+    printf("%-5s %-25s %-15s\n", "ID", "Nome", "Cargo");
 
     int id, cargo;
     char nome[50], senha[50];
+
     while (fgets(linha, sizeof(linha), f)) {
-        sscanf(linha, "%d,%49[^,],%d,%49[^\n]", &id, nome, &cargo, senha);
-        printf("%-5d %-25s %-10s\n", id, nome,
-               cargo == 0 ? "Admin" : cargo == 1 ? "Participante" : "Avaliador");
+        if (sscanf(linha, "%d,%49[^,],%d,%49[^\n]", &id, nome, &cargo, senha) == 4)
+            printf("%-5d %-25s %-15s\n", id, nome, cargo_pra_texto(cargo));
     }
+
     fclose(f);
 }
 
-// ================================================================
-// Deleta usuário pelo ID informado
-// ================================================================
+// ============================================================================
+// 2. Deletar usuário por ID
+// ============================================================================
 void deletar_usuario() {
     listar_todos_usuarios();
-
-    int id_remover;
-    printf("\nDigite o ID do usuário a ser deletado: ");
-    scanf("%d", &id_remover);
+    printf("\nDigite o ID do usuário que deseja deletar: ");
+    int id_alvo;
+    scanf("%d", &id_alvo);
     getchar();
 
     FILE *f = abrir_csv("users.csv");
-    if (!f) return;
+    if (!f) {
+        printf("Erro ao abrir arquivo de usuários.\n");
+        return;
+    }
 
-    FILE *tmp = fopen("./dados/users_temp.csv", "w");
-    fprintf(tmp, "ID,NOME,CARGO,SENHA\n");
+    FILE *temp = fopen("./dados/temp_users.csv", "w");
+    fprintf(temp, "ID,NOME,CARGO,SENHA\n");
 
     char linha[256];
-    fgets(linha, sizeof(linha), f);
     int id, cargo;
     char nome[50], senha[50];
+    int encontrado = 0;
 
+    fgets(linha, sizeof(linha), f);
     while (fgets(linha, sizeof(linha), f)) {
         sscanf(linha, "%d,%49[^,],%d,%49[^\n]", &id, nome, &cargo, senha);
-        if (id != id_remover)
-            fprintf(tmp, "%d,%s,%d,%s\n", id, nome, cargo, senha);
+        if (id == id_alvo) {
+            encontrado = 1;
+            continue;
+        }
+        fprintf(temp, "%d,%s,%d,%s\n", id, nome, cargo, senha);
     }
 
     fclose(f);
-    fclose(tmp);
-
+    fclose(temp);
     remove("./dados/users.csv");
-    rename("./dados/users_temp.csv", "./dados/users.csv");
+    rename("./dados/temp_users.csv", "./dados/users.csv");
 
-    printf("Usuário removido com sucesso!\n");
+    if (encontrado)
+        printf("Usuário ID %d deletado com sucesso.\n", id_alvo);
+    else
+        printf("Usuário não encontrado.\n");
 }
 
-// ================================================================
-// Deleta equipe pelo ID informado
-// ================================================================
-void deletar_equipe() {
-    listar_todas_equipes();
-
-    int id_remover;
-    printf("\nDigite o ID da equipe a ser deletada: ");
-    scanf("%d", &id_remover);
-    getchar();
-
+// ============================================================================
+// 3. Listar todas as equipes
+// ============================================================================
+void listar_todas_equipes() {
     FILE *f = abrir_csv("equipes.csv");
-    if (!f) return;
-
-    FILE *tmp = fopen("./dados/equipes_temp.csv", "w");
-    fprintf(tmp, "ID_EQUIPE,NOME_EQUIPE,CRIADOR,PARTICIPANTES\n");
+    if (!f) {
+        printf("Nenhuma equipe cadastrada.\n");
+        return;
+    }
 
     char linha[512];
     fgets(linha, sizeof(linha), f);
-    int id;
-    char nome[100], criador[50], participantes[300];
 
+    printf("\n--- EQUIPES CADASTRADAS ---\n");
+    printf("%-5s %-25s %-25s %-50s\n", "ID", "Equipe", "Líder", "Integrantes");
+
+    int id;
+    char nome[100], lider[50], integrantes[200];
     while (fgets(linha, sizeof(linha), f)) {
-        sscanf(linha, "%d,%99[^,],%49[^,],%299[^\n]", &id, nome, criador, participantes);
-        if (id != id_remover)
-            fprintf(tmp, "%d,%s,%s,%s\n", id, nome, criador, participantes);
+        if (sscanf(linha, "%d,%99[^,],%49[^,],%199[^\n]", &id, nome, lider, integrantes) == 4)
+            printf("%-5d %-25s %-25s %-50s\n", id, nome, lider, integrantes);
     }
 
     fclose(f);
-    fclose(tmp);
+}
 
+// ============================================================================
+// 4. Deletar equipe
+// ============================================================================
+void deletar_equipe() {
+    listar_todas_equipes();
+    printf("\nDigite o ID da equipe que deseja deletar: ");
+    int id_alvo;
+    scanf("%d", &id_alvo);
+    getchar();
+
+    FILE *f = abrir_csv("equipes.csv");
+    if (!f) {
+        printf("Erro ao abrir arquivo de equipes.\n");
+        return;
+    }
+
+    FILE *temp = fopen("./dados/temp_equipes.csv", "w");
+    fprintf(temp, "ID_EQUIPE,NOME_EQUIPE,CRIADOR,INTEGRANTES\n");
+
+    char linha[512];
+    int id;
+    char nome[100], criador[50], integrantes[200];
+    int encontrado = 0;
+
+    fgets(linha, sizeof(linha), f);
+    while (fgets(linha, sizeof(linha), f)) {
+        sscanf(linha, "%d,%99[^,],%49[^,],%199[^\n]", &id, nome, criador, integrantes);
+        if (id == id_alvo) {
+            encontrado = 1;
+            continue;
+        }
+        fprintf(temp, "%d,%s,%s,%s\n", id, nome, criador, integrantes);
+    }
+
+    fclose(f);
+    fclose(temp);
     remove("./dados/equipes.csv");
-    rename("./dados/equipes_temp.csv", "./dados/equipes.csv");
+    rename("./dados/temp_equipes.csv", "./dados/equipes.csv");
 
-    printf("Equipe removida com sucesso!\n");
+    if (encontrado)
+        printf("Equipe ID %d deletada com sucesso.\n", id_alvo);
+    else
+        printf("Equipe não encontrada.\n");
+}
+
+// ============================================================================
+// 5. Alterar pontuação de equipe
+// ============================================================================
+void alterar_pontuacao_equipe() {
+    listar_pontuacoes();
+
+    printf("\nDigite o nome exato da equipe que deseja alterar a pontuação: ");
+    char nome_equipe[100];
+    fgets(nome_equipe, sizeof(nome_equipe), stdin);
+    nome_equipe[strcspn(nome_equipe, "\n")] = '\0';
+
+    Pontuacao p;
+    if (!buscar_pontuacao_por_equipe(nome_equipe, &p)) {
+        printf("Equipe '%s' não encontrada no sistema.\n", nome_equipe);
+        return;
+    }
+
+    printf("Pontuação atual: %d\n", p.pontos);
+    printf("Nova pontuação: ");
+    int nova_pontuacao;
+    scanf("%d", &nova_pontuacao);
+    getchar();
+
+    Result r = atualizar_pontuacao(nome_equipe, nova_pontuacao);
+    if (r.code == OK)
+        printf("Pontuação da equipe '%s' atualizada com sucesso!\n", nome_equipe);
+    else
+        print_err(&r);
 }

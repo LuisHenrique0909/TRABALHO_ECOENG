@@ -1,24 +1,20 @@
 #include "Pontuacao.h"
 #include "Files.h"
+#include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 
-Result registrar_pontuacao_para_equipe(int id_equipe, const char *nome_equipe, const char *tipo, float tempo) {
-    FILE *f = escrever_no_csv("resultados_robo.csv", "ID_EQUIPE,NOME_EQUIPE,DESAFIO,TEMPO,PONTOS\n");
-    if (!f) return erro(ERRO_ARQUIVO, "Erro ao abrir resultados_robo.csv");
+// Adiciona ou atualiza pontuação no arquivo CSV de resultados
+void registrar_pontuacao_para_equipe(int id, const char *nome, const char *tipo, float tempo, int pontos) {
+    FILE *f = fopen("./dados/resultados_robo.csv", "a");
+    if (!f) {
+        printf("Erro ao registrar pontuação.\n");
+        return;
+    }
 
-    Pontuacao p;
-    p.id_equipe = id_equipe;
-    strncpy(p.nome_equipe, nome_equipe, sizeof(p.nome_equipe));
-    strncpy(p.tipo_desafio, tipo, sizeof(p.tipo_desafio));
-    p.tempo = tempo;
+    // Se arquivo vazio, escreve cabeçalho
+    long pos = ftell(f);
+    if (pos == 0) fprintf(f, "ID_EQUIPE,NOME_EQUIPE,DESAFIO,TEMPO,PONTOS\n");
 
-    if (strcmp(tipo, "Seguidor") == 0)
-        p.pontos = (int)(1000 / tempo);
-    else
-        p.pontos = 100; // padrão para sumô
-
-    fprintf(f, "%d,%s,%s,%.2f,%d\n", p.id_equipe, p.nome_equipe, p.tipo_desafio, p.tempo, p.pontos);
+    fprintf(f, "%d,%s,%s,%.2f,%d\n", id, nome, tipo, tempo, pontos);
     fclose(f);
-    return ok();
 }

@@ -1,76 +1,90 @@
 #include "Files.h"
+#include <sys/stat.h>
+#include <string.h>
+#include <stdlib.h>
 
-// ================================================================
-// Cria o diretório "./dados" caso ele não exista
-// ================================================================
-void verificar_diretorio_dados() {
+// ============================================================================
+// Cria a pasta ./dados caso não exista
+// ============================================================================
+void criar_diretorio_dados() {
+#ifdef _WIN32
+    struct _stat st = {0};
+    if (_stat(DATA_DIR, &st) == -1) {
+        system("mkdir dados");
+    }
+#else
     struct stat st = {0};
     if (stat(DATA_DIR, &st) == -1) {
-#ifdef _WIN32
-        mkdir(DATA_DIR);
-#else
-        mkdir(DATA_DIR, 0700);
-#endif
+        system("mkdir -p dados");
     }
+#endif
 }
 
-// ================================================================
-// Verifica se o arquivo existe dentro de /dados/
-// ================================================================
+// ============================================================================
+// Verifica se um arquivo existe dentro de ./dados/
+// ============================================================================
 int arquivo_existe(const char *arquivo) {
     char caminho[256];
     snprintf(caminho, sizeof(caminho), "%s%s", DATA_DIR, arquivo);
-    struct stat buffer;
-    return (stat(caminho, &buffer) == 0);
-}
-
-// ================================================================
-// Abre arquivo CSV apenas para leitura
-// ================================================================
-FILE *abrir_csv(const char *arquivo) {
-    verificar_diretorio_dados(); // Garante que ./dados/ existe
-
-    char caminho[256];
-    snprintf(caminho, sizeof(caminho), "%s%s", DATA_DIR, arquivo);
-
     FILE *f = fopen(caminho, "r");
-    if (!f) {
-        return NULL; // Não exibe erro, apenas retorna NULL
-    }
+    if (!f) return 0;
+    fclose(f);
+    return 1;
+}
+
+// ============================================================================
+// Abre um CSV existente em modo leitura
+// ============================================================================
+FILE* abrir_csv(const char *arquivo) {
+    char caminho[256];
+    snprintf(caminho, sizeof(caminho), "%s%s", DATA_DIR, arquivo);
+    FILE *f = fopen(caminho, "r");
     return f;
 }
 
-// ================================================================
-// Abre CSV para escrita em modo append ("a"), criando se não existir
-// Se for um novo arquivo e tiver header, escreve automaticamente o cabeçalho
-// ================================================================
-FILE *escrever_no_csv(const char *arquivo, const char *header) {
-    verificar_diretorio_dados(); // Garante que ./dados/ existe
-
+// ============================================================================
+// Abre um CSV para escrita, adicionando cabeçalho se o arquivo não existir
+// Usa modo append ("a"), garantindo persistência e não sobrescrita
+// ============================================================================
+FILE* escrever_no_csv(const char *arquivo, const char *cabecalho) {
     char caminho[256];
     snprintf(caminho, sizeof(caminho), "%s%s", DATA_DIR, arquivo);
 
-    int novo_arquivo = !arquivo_existe(arquivo);
+    int existe = arquivo_existe(arquivo);
     FILE *f = fopen(caminho, "a");
+    if (!f) return NULL;
 
-    if (!f) {
-        printf("❌ Erro ao abrir arquivo: %s\n", caminho);
-        return NULL;
-    }
-
-    // Se for novo arquivo, adiciona o cabeçalho
-    if (novo_arquivo && header && strlen(header) > 0) {
-        fprintf(f, "%s\n", header);
-        fflush(f);
-    }
+    if (!existe && cabecalho != NULL)
+        fprintf(f, "%s", cabecalho);
 
     return f;
 }
 
-// ================================================================
-// Remove '\n' do final de uma string (usada em fgets)
-// ================================================================
-void limpar_linha(char *linha) {
-    if (!linha) return;
-    linha[strcspn(linha, "\n")] = '\0';
+// ============================================================================
+// Conta o número de linhas (útil para gerar IDs automáticos)
+// ============================================================================
+long contar_linhas(const char *arquivo) {
+    FILE *f = abrir_csv(arquivo);
+    if (!f) return 0;
+
+    long count = 0;
+    char c;
+    while ((c = fgetc(f)) != EOF) {
+        if (c == '\n') count++;
+    }
+
+    fclose(f);
+    return count;
+}
+
+// ============================================================================
+// Limpa completamente um arquivo CSV e reescreve o cabeçalho
+// ============================================================================
+Result limpar_arquivo(const char *arquivo) {
+    char caminho[256];
+    snprintf(caminho, sizeof(caminho), "%s%s", DATA_DIR, arquivo);
+    FILE *f = fopen(caminho, "w");
+    if (!f) return erro(ERRO_ARQUIVO, "Falha ao limpar o arquivo CSV.");
+    fclose(f);
+    return ok();
 }

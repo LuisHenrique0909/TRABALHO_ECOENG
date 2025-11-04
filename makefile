@@ -1,5 +1,5 @@
 # ==========================
-# Makefile para SISTEMA_ECOENG
+# Makefile para TRABALHO_ECOENG
 # Compatível com Windows (CMD / PowerShell)
 # ==========================
 
@@ -7,40 +7,36 @@
 CC = gcc
 
 # Opções de compilação
+# -Wall: mostra todos os warnings
+# -g: adiciona informações de debug
+# -I<path>: adiciona diretórios onde o compilador deve procurar .h
 CFLAGS = -Wall -g \
 	-I. \
 	-ICadastro/Cadastro_Equipes \
 	-ICadastro/Cadastro_user \
-	-IDesafio_robo \
-	-IPontuacao \
-	-IMenus \
-	-IMenus/Menu_Admin \
-	-IMenus/Menu_Avaliador \
+	-IDesafio_robo_Pontuacao \
+	-IFuncoes_cvs \
 	-IMenus/Menu_Equipes \
-	-IMenus/Menu_Principal \
-	-IMenus/Ranking \
 	-IUtilidades/FILES \
 	-IUtilidades/Result
 
-# Diretórios de build e saída
+# Pasta de build intermediária
 BUILD_DIR = build
+
+# Pasta de saída do executável
 BIN_DIR = bin
 
 # Nome do executável final
 TARGET = $(BIN_DIR)\ecoeng.exe
 
 # ==========================
-# Estrutura de diretórios
+# Subpastas do projeto
 # ==========================
 DIRS = Cadastro/Cadastro_Equipes \
        Cadastro/Cadastro_user \
-       Desafio_robo \
-       Pontuacao \
-       Menus/Menu_Admin \
-       Menus/Menu_Avaliador \
+       Desafio_robo_Pontuacao \
+       Funcoes_cvs \
        Menus/Menu_Equipes \
-       Menus/Menu_Principal \
-       Menus/Ranking \
        Utilidades/FILES \
        Utilidades/Result
 
@@ -50,13 +46,9 @@ DIRS = Cadastro/Cadastro_Equipes \
 SRC = main.c \
       $(wildcard Cadastro/Cadastro_Equipes/*.c) \
       $(wildcard Cadastro/Cadastro_user/*.c) \
-      $(wildcard Desafio_robo/*.c) \
-      $(wildcard Pontuacao/*.c) \
-      $(wildcard Menus/Menu_Admin/*.c) \
-      $(wildcard Menus/Menu_Avaliador/*.c) \
+      $(wildcard Desafio_robo_Pontuacao/*.c) \
+      $(wildcard Funcoes_cvs/*.c) \
       $(wildcard Menus/Menu_Equipes/*.c) \
-      $(wildcard Menus/Menu_Principal/*.c) \
-      $(wildcard Menus/Ranking/*.c) \
       $(wildcard Utilidades/FILES/*.c) \
       $(wildcard Utilidades/Result/*.c)
 
@@ -86,12 +78,21 @@ $(BUILD_DIR)/%.o: %.c
 # ==========================
 prepare:
 	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
-	@for %%d in ($(DIRS)) do @if not exist $(BUILD_DIR)\%%d mkdir $(BUILD_DIR)\%%d
+	@if not exist $(BUILD_DIR)\Cadastro mkdir $(BUILD_DIR)\Cadastro
+	@if not exist $(BUILD_DIR)\Cadastro\Cadastro_Equipes mkdir $(BUILD_DIR)\Cadastro\Cadastro_Equipes
+	@if not exist $(BUILD_DIR)\Cadastro\Cadastro_user mkdir $(BUILD_DIR)\Cadastro\Cadastro_user
+	@if not exist $(BUILD_DIR)\Desafio_robo_Pontuacao mkdir $(BUILD_DIR)\Desafio_robo_Pontuacao
+	@if not exist $(BUILD_DIR)\Funcoes_cvs mkdir $(BUILD_DIR)\Funcoes_cvs
+	@if not exist $(BUILD_DIR)\Menus mkdir $(BUILD_DIR)\Menus
+	@if not exist $(BUILD_DIR)\Menus\Menu_Equipes mkdir $(BUILD_DIR)\Menus\Menu_Equipes
+	@if not exist $(BUILD_DIR)\Utilidades mkdir $(BUILD_DIR)\Utilidades
+	@if not exist $(BUILD_DIR)\Utilidades\FILES mkdir $(BUILD_DIR)\Utilidades\FILES
+	@if not exist $(BUILD_DIR)\Utilidades\Result mkdir $(BUILD_DIR)\Utilidades\Result
 	@if not exist $(BIN_DIR) mkdir $(BIN_DIR)
 
 # ==========================
 # Limpeza
-# ==========================
+# ==========================S
 clean:
 	@if exist $(BUILD_DIR) rd /S /Q $(BUILD_DIR)
 	@if exist $(TARGET) del $(TARGET)
@@ -100,4 +101,4 @@ clean:
 # Executar o programa
 # ==========================
 run: all
-	$(TARGET)
+	./$(TARGET)
