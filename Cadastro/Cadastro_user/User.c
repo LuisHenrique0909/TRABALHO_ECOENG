@@ -77,7 +77,7 @@ void singin() {
     inicializar_avaliador();
 
     printf("\n--- Cadastro de Participante ---\n");
-    printf("Nome completo: ");
+    printf("Nome: ");
     fgets(u.nome, sizeof(u.nome), stdin);
     limpar_linha(u.nome);
 
