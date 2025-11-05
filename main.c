@@ -9,11 +9,7 @@
 
 int main() {
 
-#ifdef _WIN32
     setlocale(LC_ALL, "Portuguese_Brazil.1252");
-#else
-    setlocale(LC_ALL, "");
-#endif
 
     printf("==============================================\n");
     printf("   SISTEMA DE GERENCIAMENTO DO EVENTO ECOENG  \n");
