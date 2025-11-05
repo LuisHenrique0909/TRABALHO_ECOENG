@@ -202,7 +202,6 @@ User* login_user() {
 
     if (!logado) {
         printf("Nome, RA ou senha incorretos.\n");
-        // Não faz free(u) aqui porque u só é alocado se logado=1
         return NULL;
     }
 
