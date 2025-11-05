@@ -159,7 +159,11 @@ Result cadastrar_equipe(User *lider) {
         return erro(ERRO_LOGICA, "Você já está em uma equipe.");
 
     Equipe e;
-    e.id_equipe = (int)contar_linhas("equipes.csv");
+    
+    // CORREÇÃO: Conta apenas linhas de dados (exclui cabeçalho)
+    long total_linhas = contar_linhas("equipes.csv");
+    e.id_equipe = (total_linhas > 0) ? (int)(total_linhas - 1) : 0;
+    
     strcpy(e.nome_lider, lider->nome);
 
     printf("\n--- Cadastro de Equipe ---\n");
