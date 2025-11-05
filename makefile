@@ -75,19 +75,16 @@ $(BUILD_DIR)/%.o: %.c
 # ==========================
 prepare:
 	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
-	@if not exist $(BUILD_DIR)\Cadastro mkdir $(BUILD_DIR)\Cadastro
-	@if not exist $(BUILD_DIR)\Cadastro\Cadastro_Equipes mkdir $(BUILD_DIR)\Cadastro\Cadastro_Equipes
-	@if not exist $(BUILD_DIR)\Cadastro\Cadastro_user mkdir $(BUILD_DIR)\Cadastro\Cadastro_user
-	@if not exist $(BUILD_DIR)\Desafio_robo mkdir $(BUILD_DIR)\Desafio_robo
-	@if not exist $(BUILD_DIR)\Desafio_robo\Pontuacao mkdir $(BUILD_DIR)\Desafio_robo\Pontuacao
-	@if not exist $(BUILD_DIR)\Menus mkdir $(BUILD_DIR)\Menus
-	@if not exist $(BUILD_DIR)\Menus\Menu_Equipes mkdir $(BUILD_DIR)\Menus\Menu_Equipes
-	@if not exist $(BUILD_DIR)\Menus\Menu_Principal mkdir $(BUILD_DIR)\Menus\Menu_Principal
-	@if not exist $(BUILD_DIR)\Menus\Menu_Ranking mkdir $(BUILD_DIR)\Menus\Menu_Ranking
-	@if not exist $(BUILD_DIR)\Menus\Menu_Avaliador mkdir $(BUILD_DIR)\Menus\Menu_Avaliador
-	@if not exist $(BUILD_DIR)\Utilidades mkdir $(BUILD_DIR)\Utilidades
-	@if not exist $(BUILD_DIR)\Utilidades\FILES mkdir $(BUILD_DIR)\Utilidades\FILES
-	@if not exist $(BUILD_DIR)\Utilidades\Result mkdir $(BUILD_DIR)\Utilidades\Result
+	@mkdir "$(BUILD_DIR)\Cadastro\Cadastro_Equipes" 2>nul || echo.
+	@mkdir "$(BUILD_DIR)\Cadastro\Cadastro_user" 2>nul || echo.
+	@mkdir "$(BUILD_DIR)\Desafio_robo\Pontuacao" 2>nul || echo.
+	@mkdir "$(BUILD_DIR)\Menus\Menu_admin" 2>nul || echo.
+	@mkdir "$(BUILD_DIR)\Menus\Menu_Equipes" 2>nul || echo.
+	@mkdir "$(BUILD_DIR)\Menus\Menu_Principal" 2>nul || echo.
+	@mkdir "$(BUILD_DIR)\Menus\Menu_Ranking" 2>nul || echo.
+	@mkdir "$(BUILD_DIR)\Menus\Menu_Avaliador" 2>nul || echo.
+	@mkdir "$(BUILD_DIR)\Utilidades\FILES" 2>nul || echo.
+	@mkdir "$(BUILD_DIR)\Utilidades\Result" 2>nul || echo.
 	@if not exist $(BIN_DIR) mkdir $(BIN_DIR)
 
 # ==========================
