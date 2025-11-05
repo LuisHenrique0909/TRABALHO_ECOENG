@@ -259,26 +259,34 @@ void exibir_equipe_do_participante(User *usuario) {
     int id;
     char nome[100], lider[100], membros[500];
 
+    // Criar identificador do usuário no formato "nome:ra"
     char identificador_usuario[60];
     criar_identificador_participante(identificador_usuario, sizeof(identificador_usuario), usuario);
 
     while (fgets(linha, sizeof(linha), f)) {
-        sscanf(linha, "%d,%99[^,],%99[^,],%499[^\n]", &id, nome, lider, membros);
-        if (strstr(membros, identificador_usuario)) {
-            printf("\n=== SUA EQUIPE ===\n");
-            printf("────────────────────────────────────────\n");
-            printf("ID: %d\n", id);
-            printf("Nome: %s\n", nome);
-            printf("Líder: %s\n", lider);
-            formatar_exibicao_participantes(membros);
-            printf("────────────────────────────────────────\n");
-            encontrado = 1;
-            break;
+        // Limpar quebras de linha
+        linha[strcspn(linha, "\n")] = '\0';
+        linha[strcspn(linha, "\r")] = '\0';
+        
+        if (sscanf(linha, "%d,%99[^,],%99[^,],%499[^\n]", &id, nome, lider, membros) == 4) {
+            // Verificar se o usuário está na lista de membros
+            if (strstr(membros, identificador_usuario)) {
+                printf("\n=== SUA EQUIPE ===\n");
+                printf("────────────────────────────────────────\n");
+                printf("ID: %d\n", id);
+                printf("Nome: %s\n", nome);
+                printf("Líder: %s\n", lider);
+                formatar_exibicao_participantes(membros);
+                printf("────────────────────────────────────────\n");
+                encontrado = 1;
+                break;
+            }
         }
     }
 
     fclose(f);
 
-    if (!encontrado)
+    if (!encontrado) {
         printf("\nVocê ainda não está em nenhuma equipe.\n");
+    }
 }
