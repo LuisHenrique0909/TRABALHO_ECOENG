@@ -33,13 +33,17 @@ TARGET = $(BIN_DIR)\ecoeng.exe
 # ==========================
 # Subpastas do projeto
 # ==========================
-DIRS = Cadastro/Cadastro_Equipes \
-       Cadastro/Cadastro_user \
-       Desafio_robo_Pontuacao \
-       Funcoes_cvs \
-       Menus/Menu_Equipes \
-       Utilidades/FILES \
-       Utilidades/Result
+DIRS = CFLAGS = -Wall -g \
+	-I. \
+	-ICadastro/Cadastro_Equipes \
+	-ICadastro/Cadastro_user \
+	-IDesafio_robo_Pontuacao \
+	-IFuncoes_cvs \
+	-IMenus/Menu_Equipes \
+	-IMenus/Menu_Principal \
+	-IMenus/Menu_Ranking \
+	-IUtilidades/FILES \
+	-IUtilidades/Result
 
 # ==========================
 # Fontes e objetos
