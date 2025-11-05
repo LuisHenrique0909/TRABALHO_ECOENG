@@ -34,12 +34,40 @@ void menu_equipe(User *usuario) {
             case 2:
                 exibir_equipe_do_participante(usuario);
                 break;
-            case 3:
-                adicionar_participante(usuario);
+            case 3: {
+                char nome_equipe[100], nome_participante[100];
+                printf("Nome da equipe: ");
+                fgets(nome_equipe, sizeof(nome_equipe), stdin);
+                nome_equipe[strcspn(nome_equipe, "\n")] = '\0';
+
+                printf("Nome do participante para adicionar: ");
+                fgets(nome_participante, sizeof(nome_participante), stdin);
+                nome_participante[strcspn(nome_participante, "\n")] = '\0';
+
+                Result r = adicionar_participante_equipe(nome_equipe, nome_participante);
+                if (r.code == OK)
+                    printf("Participante adicionado com sucesso!\n");
+                else
+                    print_err(&r);
                 break;
-            case 4:
-                remover_participante(usuario);
+            }
+            case 4: {
+                char nome_equipe[100], nome_participante[100];
+                printf("Nome da equipe: ");
+                fgets(nome_equipe, sizeof(nome_equipe), stdin);
+                nome_equipe[strcspn(nome_equipe, "\n")] = '\0';
+
+                printf("Nome do participante para remover: ");
+                fgets(nome_participante, sizeof(nome_participante), stdin);
+                nome_participante[strcspn(nome_participante, "\n")] = '\0';
+
+                Result r = remover_participante_equipe(nome_equipe, nome_participante);
+                if (r.code == OK)
+                    printf("Participante removido com sucesso!\n");
+                else
+                    print_err(&r);
                 break;
+            }
             case 5:
                 mostrar_pontuacao_da_equipe(usuario);
                 break;
@@ -71,7 +99,7 @@ void mostrar_pontuacao_da_equipe(User *usuario) {
     char nome_equipe[100] = "";
     int id_equipe = -1;
 
-    // Busca a equipe em que o participante está
+    // Busca a equipe do participante
     while (fgets(linha_eq, sizeof(linha_eq), f_eq)) {
         int id;
         char nome_eq[100], criador[50], nomes[200];
