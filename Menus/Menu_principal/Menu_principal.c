@@ -29,24 +29,44 @@ void menu_principal() {
     }
     if (opc == 1) {
         User *usuario = login_user();
-    if (!usuario) {
-        printf("\nUsuário não encontrado.\n");
-        printf("Deseja se cadastrar como PARTICIPANTE? (s/n): ");
-        char resp;
-        scanf(" %c", &resp);
-        getchar();
+        if (!usuario) {
+            printf("\nUsuário não encontrado.\n");
+            printf("Deseja se cadastrar como PARTICIPANTE? (s/n): ");
+            char resp;
+            scanf(" %c", &resp);
+            getchar();
 
-        if (resp == 's' || resp == 'S') {
-            singin(); // Cadastro automático
-            printf("\nCadastro realizado! Faça login novamente.\n");
-        } else {
-            printf("Voltando ao menu principal...\n");
+            if (resp == 's' || resp == 'S') {
+                singin(); // Cadastro automático
+                printf("\nCadastro realizado! Faça login novamente.\n");
+            } else {
+                printf("Voltando ao menu principal...\n");
+            }
+
+            return menu_principal();
         }
 
-        return menu_principal();
-    }
+        printf("\nBem-vindo(a), %s! Cargo: %s\n", usuario->nome, cargo_pra_texto(usuario->cargo));
+        
+        // CORREÇÃO: Usar o mesmo usuário já obtido
+        // Redirecionamento conforme cargo
+        switch (usuario->cargo) {
+            case ADMIN:
+                menu_admin();
+                break;
+            case AVALIADOR:
+                menu_avaliador();
+                break;
+            case PARTICIPANTE:
+                menu_equipe(usuario);
+                break;
+            default:
+                printf("Cargo inválido. Encerrando sessão.\n");
+                break;
+        }
 
-    printf("\nBem-vindo(a), %s! Cargo: %s\n", usuario->nome, cargo_pra_texto(usuario->cargo));
+        free(usuario);
+        return menu_principal(); // Volta ao menu principal após sair do submenu
     } 
     else if (opc == 2) {
         // Cadastro
@@ -57,24 +77,4 @@ void menu_principal() {
         printf("Opção inválida. Tente novamente.\n");
         return menu_principal();
     }
-
-    User *usuario = login_user();
-
-    // Redirecionamento conforme cargo
-    switch (usuario->cargo) {
-        case ADMIN:
-            menu_admin();
-            break;
-        case AVALIADOR:
-            menu_avaliador();
-            break;
-        case PARTICIPANTE:
-            menu_equipe(usuario);
-            break;
-        default:
-            printf("Cargo inválido. Encerrando sessão.\n");
-            break;
-    }
-
-    free(usuario);
 }
