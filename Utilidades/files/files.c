@@ -51,11 +51,14 @@ FILE* escrever_no_csv(const char *arquivo, const char *cabecalho) {
     snprintf(caminho, sizeof(caminho), "%s%s", DATA_DIR, arquivo);
 
     int existe = arquivo_existe(arquivo);
-    FILE *f = fopen(caminho, "a");
+    
+    // CORREÇÃO: Usar modo write se arquivo não existe, append se existe
+    FILE *f = fopen(caminho, existe ? "a" : "w");
     if (!f) return NULL;
 
-    if (!existe && cabecalho != NULL)
+    if (!existe && cabecalho != NULL) {
         fprintf(f, "%s\n", cabecalho);
+    }
 
     return f;
 }
@@ -68,9 +71,11 @@ long contar_linhas(const char *arquivo) {
     if (!f) return 0;
 
     long count = 0;
-    char c;
-    while ((c = fgetc(f)) != EOF) {
-        if (c == '\n') count++;
+    char linha[256];
+    
+    // CORREÇÃO: Contar linhas usando fgets para maior confiabilidade
+    while (fgets(linha, sizeof(linha), f)) {
+        count++;
     }
 
     fclose(f);
@@ -85,6 +90,12 @@ Result limpar_arquivo(const char *arquivo) {
     snprintf(caminho, sizeof(caminho), "%s%s", DATA_DIR, arquivo);
     FILE *f = fopen(caminho, "w");
     if (!f) return erro(ERRO_ARQUIVO, "Falha ao limpar o arquivo CSV.");
+    
+    // CORREÇÃO: Escrever cabeçalho padrão para equipes
+    if (strstr(arquivo, "equipes") != NULL) {
+        fprintf(f, "ID_EQUIPE,NOME_EQUIPE,LIDER,PARTICIPANTES\n");
+    }
+    
     fclose(f);
     return ok();
 }
