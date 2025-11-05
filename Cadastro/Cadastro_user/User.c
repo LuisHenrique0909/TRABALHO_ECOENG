@@ -104,7 +104,7 @@ void singin() {
             if (sscanf(linha, "%d,%49[^,],%d,%49[^\n]", &RA_csv, nome_temp, &cargo_temp, senha_temp) == 4) {
                 if (RA_csv == u.RA) {
                     fclose(f);
-                    printf("Já existe um usuário com esse RA.\n");
+                    printf("Já existe um usuario com esse RA.\n");
                     return;
                 }
             }
@@ -151,7 +151,7 @@ Result cadastrar_user(User *u) {
 User* login_user() {
     FILE *f = abrir_csv("users.csv");
     if (!f) {
-        printf("Nenhum usuário encontrado. Cadastre-se primeiro.\n");
+        printf("Nenhum usuario encontrado. Cadastre-se primeiro.\n");
         return NULL;
     }
 

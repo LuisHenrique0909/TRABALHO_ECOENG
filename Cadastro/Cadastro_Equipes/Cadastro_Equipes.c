@@ -53,7 +53,7 @@ Result cadastrar_equipe(User *lider) {
 
     // Verifica se o líder já tem equipe
     if (participante_em_alguma_equipe(lider->nome))
-        return erro(ERRO_LOGICA, "Você já está em uma equipe.");
+        return erro(ERRO_LOGICA, "Você já esta em uma equipe.");
 
     Equipe e;
     e.id_equipe = (int)contar_linhas("equipes.csv"); // gera ID automaticamente
