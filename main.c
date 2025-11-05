@@ -1,21 +1,14 @@
-/* main.c
- * Ponto de entrada do Sistema ECOENG
- * - Garante diretório ./dados
- * - Inicializa usuários padrão (admin/avaliador)
- * - Inicia o menu principal (login/redirecionamento)
- */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
 
-#include "Menu_Principal.h"
+#include "Menu_principal.h"
 #include "Files.h"
 #include "User.h"
 
-int main(void) {
-    /* Ajuste de locale para evitar problemas com acentuação no Windows.
-       Se preferir, remova ou altere conforme seu ambiente. */
+int main() {
+
 #ifdef _WIN32
     setlocale(LC_ALL, "Portuguese_Brazil.1252");
 #else

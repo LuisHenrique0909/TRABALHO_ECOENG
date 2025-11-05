@@ -3,7 +3,7 @@
 
 #include "User.h"
 
-// Função principal que inicia o sistema e redireciona o usuário
+// Declaração da função do menu principal
 void menu_principal();
 
 #endif

@@ -17,6 +17,7 @@ CFLAGS = -Wall -g \
 	-IDesafio_robo_Pontuacao \
 	-IFuncoes_cvs \
 	-IMenus/Menu_Equipes \
+	-IMenus/Menu_Principal \
 	-IUtilidades/FILES \
 	-IUtilidades/Result
 
@@ -49,6 +50,7 @@ SRC = main.c \
       $(wildcard Desafio_robo_Pontuacao/*.c) \
       $(wildcard Funcoes_cvs/*.c) \
       $(wildcard Menus/Menu_Equipes/*.c) \
+      $(wildcard Menus/Menu_Principal/*.c) \
       $(wildcard Utilidades/FILES/*.c) \
       $(wildcard Utilidades/Result/*.c)
 
