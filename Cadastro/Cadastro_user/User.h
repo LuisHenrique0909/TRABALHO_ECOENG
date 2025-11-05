@@ -14,7 +14,7 @@ typedef enum {
 
 // Estrutura principal do usuário
 typedef struct {
-    int id;
+    int RA;
     char nome[50];
     Cargo cargo;
     char senha[50];

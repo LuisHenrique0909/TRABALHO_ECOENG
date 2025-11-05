@@ -77,15 +77,15 @@ void singin() {
     inicializar_avaliador();
 
     printf("\n--- Cadastro de Participante ---\n");
-    printf("Nome completo: ");
+    printf("Nome completo: \n");
     fgets(u.nome, sizeof(u.nome), stdin);
     limpar_linha(u.nome);
 
-    printf("RA (número): ");
-    scanf("%d", &u.id);
+    printf("RA (número): \n");
+    scanf("%d", &u.RA);
     getchar();
 
-    printf("Senha: ");
+    printf("Senha: \n");
     fgets(u.senha, sizeof(u.senha), stdin);
     limpar_linha(u.senha);
 
@@ -99,7 +99,7 @@ void singin() {
         fgets(linha, sizeof(linha), f); // cabeçalho
         while (fgets(linha, sizeof(linha), f)) {
             sscanf(linha, "%d,", &id_existente);
-            if (id_existente == u.id) {
+            if (id_existente == u.RA) {
                 fclose(f);
                 printf("Já existe um usuário com esse RA.\n");
                 return;
@@ -120,10 +120,10 @@ void singin() {
 // Registra usuário no CSV (modo append, persistente)
 // ================================================================
 Result cadastrar_user(User *u) {
-    FILE *f = escrever_no_csv("users.csv", "ID,NOME,CARGO,SENHA");
+    FILE *f = escrever_no_csv("users.csv", "RA,NOME,CARGO,SENHA");
     if (!f) return erro(ERRO_ARQUIVO, "Erro ao abrir users.csv");
 
-    fprintf(f, "%d,%s,%d,%s\n", u->id, u->nome, u->cargo, u->senha);
+    fprintf(f, "%d,%s,%d,%s\n", u->RA, u->nome, u->cargo, u->senha);
     fclose(f);
     return ok();
 }
@@ -138,11 +138,14 @@ User* login_user() {
         return NULL;
     }
 
-    char nome[50], senha[50];
+    char nome[50], senha[50], RA[8];
     printf("\n--- LOGIN ---\n");
     printf("Nome: ");
     fgets(nome, sizeof(nome), stdin);
     limpar_linha(nome);
+    printf("RA: ");
+    fgets(RA, sizeof(RA), stdin);
+    limpar_linha(RA);
     printf("Senha: ");
     fgets(senha, sizeof(senha), stdin);
     limpar_linha(senha);
@@ -151,15 +154,15 @@ User* login_user() {
     fgets(linha, sizeof(linha), f); // pula cabeçalho
 
     User *u = malloc(sizeof(User));
-    int id, cargo;
+    int RA_csv, cargo;
     int logado = 0;
 
     while (fgets(linha, sizeof(linha), f)) {
-        char nome_csv[50], senha_csv[50];
-        sscanf(linha, "%d,%49[^,],%d,%49[^\n]", &id, nome_csv, &cargo, senha_csv);
+        char nome_csv[50], senha_csv[50], RA_csv[7];
+        sscanf(linha, "%d,%49[^,],%d,%49[^,],%7[^,\n]", &RA_csv, nome_csv, &cargo, senha_csv);
 
-        if (strcmp(nome_csv, nome) == 0 && strcmp(senha_csv, senha) == 0) {
-            u->id = id;
+        if (strcmp(nome_csv, nome) == 0 && strcmp(senha_csv, senha) == 0 && strcmp(RA_csv, RA) == 0) {
+            u->RA = atoi(RA_csv);
             strcpy(u->nome, nome_csv);
             u->cargo = cargo;
             strcpy(u->senha, senha_csv);
@@ -170,7 +173,7 @@ User* login_user() {
     fclose(f);
 
     if (!logado) {
-        printf("Nome ou senha incorretos.\n");
+        printf("Nome, RA ou senha incorretos.\n");
         free(u);
         return NULL;
     }

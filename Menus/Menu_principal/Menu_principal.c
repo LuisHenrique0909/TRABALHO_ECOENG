@@ -15,6 +15,7 @@ void menu_principal() {
 
     printf("\n===== SISTEMA DE GERENCIAMENTO DO EVENTO ECOENG =====\n");
     printf("1 - Fazer login\n");
+    printf("2 - Cadastrar novo usuário\n");
     printf("0 - Sair\n");
     printf("Escolha: ");
 
@@ -26,13 +27,8 @@ void menu_principal() {
         printf("Encerrando sistema...\n");
         return;
     }
-
-    if (opc != 1) {
-        printf("Opção inválida.\n");
-        return menu_principal();
-    }
-
-    User *usuario = login_user();
+    if (opc == 1) {
+        User *usuario = login_user();
     if (!usuario) {
         printf("\nUsuário não encontrado.\n");
         printf("Deseja se cadastrar como PARTICIPANTE? (s/n): ");
@@ -51,6 +47,18 @@ void menu_principal() {
     }
 
     printf("\nBem-vindo(a), %s! Cargo: %s\n", usuario->nome, cargo_pra_texto(usuario->cargo));
+    } 
+    else if (opc == 2) {
+        // Cadastro
+        singin();
+        printf("\nCadastro realizado!\n");
+        return menu_principal();
+    } else {
+        printf("Opção inválida. Tente novamente.\n");
+        return menu_principal();
+    }
+
+    User *usuario = login_user();
 
     // Redirecionamento conforme cargo
     switch (usuario->cargo) {
