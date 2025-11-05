@@ -48,7 +48,6 @@ SRC = main.c \
       $(wildcard Cadastro/Cadastro_Equipes/*.c) \
       $(wildcard Cadastro/Cadastro_user/*.c) \
       $(wildcard Desafio_robo_Pontuacao/*.c) \
-      $(wildcard Funcoes_cvs/*.c) \
       $(wildcard Menus/Menu_Equipes/*.c) \
       $(wildcard Menus/Menu_Principal/*.c) \
       $(wildcard Utilidades/FILES/*.c) \

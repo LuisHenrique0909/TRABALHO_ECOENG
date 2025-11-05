@@ -2,6 +2,7 @@
 #define USER_H
 
 #include "Result.h"
+#include "files.h"
 #include <stdio.h>
 
 // Enum de cargos

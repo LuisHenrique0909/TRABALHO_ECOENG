@@ -88,3 +88,11 @@ Result limpar_arquivo(const char *arquivo) {
     fclose(f);
     return ok();
 }
+
+#include <string.h>
+
+// Remove o caractere '\n' final de uma string lida por fgets
+void limpar_linha(char *str) {
+    if (!str) return;
+    str[strcspn(str, "\n")] = '\0';
+}
