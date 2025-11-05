@@ -22,35 +22,51 @@ void menu_avaliador() {
 
         switch (opc) {
             case 1: {
-                iniciar_desafio(SUMO);
-                Resultado_Desafio res = {0};
-                res.tipo = SUMO;
-                registrar_resultado(&res);
+            printf("\n=== INICIANDO DESAFIO ROBÔ SUMÔ ===\n");
+            iniciar_desafio(SUMO);
+            Resultado_Desafio res = {0};
+            res.tipo = SUMO;
+            registrar_resultado(&res);
 
-                printf("\nDeseja visualizar o ranking atualizado? (s/n): ");
-                char resp;
-                scanf(" %c", &resp);
+            printf("\nDeseja visualizar o ranking? (s/n): ");
+             char resp;
+            scanf(" %c", &resp);
+             getchar();
+             if (resp == 's' || resp == 'S') {
+                printf("\n1 - Ranking Sumô\n2 - Ranking Geral\nEscolha: ");
+                int opc_rank;
+                scanf("%d", &opc_rank);
                 getchar();
-                if (resp == 's' || resp == 'S')
-                    mostrar_ranking(SUMO);
-                break;
+                if (opc_rank == 1) mostrar_ranking(SUMO);
+                else if (opc_rank == 2) mostrar_ranking_geral();
+            }
+            break;
+
             }
             case 2: {
-                iniciar_desafio(SEGUIDOR_LINHA);
-                Resultado_Desafio res = {0};
-                res.tipo = SEGUIDOR_LINHA;
-                registrar_resultado(&res);
+            printf("\n=== INICIANDO DESAFIO ROBÔ SEGUIDOR DE LINHA ===\n");
+            iniciar_desafio(SEGUIDOR_LINHA);
+            Resultado_Desafio res = {0};
+            res.tipo = SEGUIDOR_LINHA;
+            registrar_resultado(&res);
 
-                printf("\nDeseja visualizar o ranking atualizado? (s/n): ");
-                char resp;
-                scanf(" %c", &resp);
+            printf("\nDeseja visualizar o ranking? (s/n): ");
+            char resp;
+            scanf(" %c", &resp);
+            getchar();
+            if (resp == 's' || resp == 'S') {
+                printf("\n1 - Ranking Seguidor de Linha\n2 - Ranking Geral\nEscolha: ");
+                int opc_rank;
+                scanf("%d", &opc_rank);
                 getchar();
-                if (resp == 's' || resp == 'S')
-                    mostrar_ranking(SEGUIDOR_LINHA);
-                break;
+                if (opc_rank == 1) mostrar_ranking(SEGUIDOR_LINHA);
+                else if (opc_rank == 2) mostrar_ranking_geral();
+            }
+            break;
+            
             }
             case 3:
-                listar_equipes();
+                listar_equipes();  // Agora usa a formatação otimizada
                 break;
             case 4:
                 menu_ranking();

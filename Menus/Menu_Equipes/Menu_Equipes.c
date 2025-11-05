@@ -36,6 +36,8 @@ void menu_equipe(User *usuario) {
                 break;
             case 3: {
                 char nome_equipe[100], nome_participante[100];
+                int ra_participante;
+                
                 printf("Nome da equipe: ");
                 fgets(nome_equipe, sizeof(nome_equipe), stdin);
                 nome_equipe[strcspn(nome_equipe, "\n")] = '\0';
@@ -44,7 +46,16 @@ void menu_equipe(User *usuario) {
                 fgets(nome_participante, sizeof(nome_participante), stdin);
                 nome_participante[strcspn(nome_participante, "\n")] = '\0';
 
-                Result r = adicionar_participante_equipe(nome_equipe, nome_participante);
+                printf("RA do participante: ");
+                scanf("%d", &ra_participante);
+                getchar();
+
+                // Criar objeto User temporário para o participante
+                User participante;
+                strcpy(participante.nome, nome_participante);
+                participante.RA = ra_participante;
+
+                Result r = adicionar_participante_equipe(nome_equipe, &participante);
                 if (r.code == OK)
                     printf("Participante adicionado com sucesso!\n");
                 else
@@ -53,6 +64,8 @@ void menu_equipe(User *usuario) {
             }
             case 4: {
                 char nome_equipe[100], nome_participante[100];
+                int ra_participante;
+                
                 printf("Nome da equipe: ");
                 fgets(nome_equipe, sizeof(nome_equipe), stdin);
                 nome_equipe[strcspn(nome_equipe, "\n")] = '\0';
@@ -61,7 +74,16 @@ void menu_equipe(User *usuario) {
                 fgets(nome_participante, sizeof(nome_participante), stdin);
                 nome_participante[strcspn(nome_participante, "\n")] = '\0';
 
-                Result r = remover_participante_equipe(nome_equipe, nome_participante);
+                printf("RA do participante: ");
+                scanf("%d", &ra_participante);
+                getchar();
+
+                // Criar objeto User temporário para o participante
+                User participante;
+                strcpy(participante.nome, nome_participante);
+                participante.RA = ra_participante;
+
+                Result r = remover_participante_equipe(nome_equipe, &participante);
                 if (r.code == OK)
                     printf("Participante removido com sucesso!\n");
                 else
@@ -99,12 +121,15 @@ void mostrar_pontuacao_da_equipe(User *usuario) {
     char nome_equipe[100] = "";
     int id_equipe = -1;
 
-    // Busca a equipe do participante
+    // Busca a equipe do participante usando identificador Nome:RA
+    char identificador_usuario[60];
+    snprintf(identificador_usuario, sizeof(identificador_usuario), "%s:%d", usuario->nome, usuario->RA);
+
     while (fgets(linha_eq, sizeof(linha_eq), f_eq)) {
         int id;
-        char nome_eq[100], criador[50], nomes[200];
-        if (sscanf(linha_eq, "%d,%99[^,],%49[^,],%199[^\n]", &id, nome_eq, criador, nomes) == 4) {
-            if (strstr(nomes, usuario->nome)) {
+        char nome_eq[100], criador[50], participantes[500];
+        if (sscanf(linha_eq, "%d,%99[^,],%49[^,],%499[^\n]", &id, nome_eq, criador, participantes) == 4) {
+            if (strstr(participantes, identificador_usuario)) {
                 strcpy(nome_equipe, nome_eq);
                 id_equipe = id;
                 break;
@@ -132,19 +157,27 @@ void mostrar_pontuacao_da_equipe(User *usuario) {
     float tempo;
     int pontos;
     int encontrou = 0;
+    int total_pontos = 0;
 
-    printf("\n--- PONTUAÇÃO DA SUA EQUIPE (%s) ---\n", nome_equipe);
+    printf("\n=== PONTUAÇÃO DA SUA EQUIPE (%s) ===\n", nome_equipe);
+    printf("────────────────────────────────────────\n");
+    
     while (fgets(linha, sizeof(linha), f_res)) {
         if (sscanf(linha, "%d,%99[^,],%49[^,],%f,%d", &id, nome_csv, tipo, &tempo, &pontos) == 5) {
             if (strcmp(nome_csv, nome_equipe) == 0) {
-                printf("Desafio: %s | Tempo: %.2f s | Pontos: %d\n", tipo, tempo, pontos);
+                printf("• Desafio: %-20s | Tempo: %6.2f s | Pontos: %3d\n", tipo, tempo, pontos);
+                total_pontos += pontos;
                 encontrou = 1;
             }
         }
     }
 
-    if (!encontrou)
+    if (encontrou) {
+        printf("────────────────────────────────────────\n");
+        printf("PONTUAÇÃO TOTAL: %d pontos\n", total_pontos);
+    } else {
         printf("Esta equipe ainda não possui pontuação registrada.\n");
+    }
 
     fclose(f_res);
 }

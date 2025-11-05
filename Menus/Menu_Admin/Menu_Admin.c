@@ -2,6 +2,7 @@
 #include "Files.h"
 #include "Pontuacao.h"
 #include "Ranking.h"
+#include "Cadastro_Equipes.h"  // Incluído para usar listar_equipes()
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,7 +28,7 @@ void menu_admin() {
         switch (opc) {
             case 1: listar_todos_usuarios(); break;
             case 2: deletar_usuario(); break;
-            case 3: listar_todas_equipes(); break;
+            case 3: listar_equipes(); break;  // Agora usa a função otimizada
             case 4: deletar_equipe(); break;
             case 5: alterar_pontuacao_equipe(); break;
             case 6: menu_ranking(); break;
@@ -50,17 +51,24 @@ void listar_todos_usuarios() {
     char linha[256];
     fgets(linha, sizeof(linha), f);
 
-    printf("\n--- USUÁRIOS CADASTRADOS ---\n");
+    printf("\n=== USUÁRIOS CADASTRADOS ===\n");
+    printf("────────────────────────────────────────\n");
     printf("%-5s %-25s %-15s\n", "ID", "Nome", "Cargo");
+    printf("────────────────────────────────────────\n");
 
     int id, cargo;
     char nome[50], senha[50];
+    int count = 0;
 
     while (fgets(linha, sizeof(linha), f)) {
-        if (sscanf(linha, "%d,%49[^,],%d,%49[^\n]", &id, nome, &cargo, senha) == 4)
+        if (sscanf(linha, "%d,%49[^,],%d,%49[^\n]", &id, nome, &cargo, senha) == 4) {
             printf("%-5d %-25s %-15s\n", id, nome, cargo_pra_texto(cargo));
+            count++;
+        }
     }
 
+    printf("────────────────────────────────────────\n");
+    printf("Total de usuários: %d\n", count);
     fclose(f);
 }
 
@@ -93,6 +101,7 @@ void deletar_usuario() {
         sscanf(linha, "%d,%49[^,],%d,%49[^\n]", &id, nome, &cargo, senha);
         if (id == id_alvo) {
             encontrado = 1;
+            printf("Usuário '%s' (ID: %d) será removido.\n", nome, id);
             continue;
         }
         fprintf(temp, "%d,%s,%d,%s\n", id, nome, cargo, senha);
@@ -110,36 +119,11 @@ void deletar_usuario() {
 }
 
 // ============================================================================
-// 3. Listar todas as equipes
-// ============================================================================
-void listar_todas_equipes() {
-    FILE *f = abrir_csv("equipes.csv");
-    if (!f) {
-        printf("Nenhuma equipe cadastrada.\n");
-        return;
-    }
-
-    char linha[512];
-    fgets(linha, sizeof(linha), f);
-
-    printf("\n--- EQUIPES CADASTRADAS ---\n");
-    printf("%-5s %-25s %-25s %-50s\n", "ID", "Equipe", "Líder", "Integrantes");
-
-    int id;
-    char nome[100], lider[50], integrantes[200];
-    while (fgets(linha, sizeof(linha), f)) {
-        if (sscanf(linha, "%d,%99[^,],%49[^,],%199[^\n]", &id, nome, lider, integrantes) == 4)
-            printf("%-5d %-25s %-25s %-50s\n", id, nome, lider, integrantes);
-    }
-
-    fclose(f);
-}
-
-// ============================================================================
 // 4. Deletar equipe
 // ============================================================================
 void deletar_equipe() {
-    listar_todas_equipes();
+    listar_equipes();  // Usa a nova formatação otimizada
+    
     printf("\nDigite o ID da equipe que deseja deletar: ");
     int id_alvo;
     scanf("%d", &id_alvo);
@@ -152,21 +136,22 @@ void deletar_equipe() {
     }
 
     FILE *temp = fopen("./dados/temp_equipes.csv", "w");
-    fprintf(temp, "ID_EQUIPE,NOME_EQUIPE,CRIADOR,INTEGRANTES\n");
+    fprintf(temp, "ID_EQUIPE,NOME_EQUIPE,LIDER,PARTICIPANTES\n");
 
     char linha[512];
     int id;
-    char nome[100], criador[50], integrantes[200];
+    char nome[100], lider[50], participantes[500];
     int encontrado = 0;
 
     fgets(linha, sizeof(linha), f);
     while (fgets(linha, sizeof(linha), f)) {
-        sscanf(linha, "%d,%99[^,],%49[^,],%199[^\n]", &id, nome, criador, integrantes);
+        sscanf(linha, "%d,%99[^,],%49[^,],%499[^\n]", &id, nome, lider, participantes);
         if (id == id_alvo) {
+            printf("Equipe '%s' (ID: %d) será removida.\n", nome, id);
             encontrado = 1;
             continue;
         }
-        fprintf(temp, "%d,%s,%s,%s\n", id, nome, criador, integrantes);
+        fprintf(temp, "%d,%s,%s,%s\n", id, nome, lider, participantes);
     }
 
     fclose(f);
@@ -184,7 +169,7 @@ void deletar_equipe() {
 // 5. Alterar pontuação de equipe
 // ============================================================================
 void alterar_pontuacao_equipe() {
-    listar_pontuacoes();
+    listar_equipes();  // Mostra equipes com a nova formatação
 
     printf("\nDigite o nome exato da equipe que deseja alterar a pontuação: ");
     char nome_equipe[100];

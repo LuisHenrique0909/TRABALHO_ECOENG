@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-// ✅ MANTENHA esta função EXATAMENTE como estava
+// MANTENHA esta função EXATAMENTE como estava
 void registrar_pontuacao_para_equipe(int id, const char *nome, const char *tipo, float tempo, int pontos) {
     FILE *f = fopen("./dados/resultados_robo.csv", "a");
     if (!f) {
@@ -19,7 +19,7 @@ void registrar_pontuacao_para_equipe(int id, const char *nome, const char *tipo,
     fclose(f);
 }
 
-// ✅ Adicione apenas as NOVAS funções que estavam faltando
+// Adicione apenas as NOVAS funções que estavam faltando
 void listar_pontuacoes() {
     FILE *f = fopen("./dados/resultados_robo.csv", "r");
     if (!f) {
@@ -46,7 +46,7 @@ void listar_pontuacoes() {
     fclose(f);
 }
 
-// ✅ Busca pontuação por nome da equipe
+// Busca pontuação por nome da equipe
 int buscar_pontuacao_por_equipe(const char* nome_equipe, Pontuacao* pontuacao) {
     FILE *f = fopen("./dados/resultados_robo.csv", "r");
     if (!f) {
@@ -76,7 +76,7 @@ int buscar_pontuacao_por_equipe(const char* nome_equipe, Pontuacao* pontuacao) {
     return encontrado;
 }
 
-// ✅ Atualiza pontuação de uma equipe
+// Atualiza pontuação de uma equipe
 Result atualizar_pontuacao(const char* nome_equipe, int nova_pontuacao) {
     FILE *f = fopen("./dados/resultados_robo.csv", "r");
     if (!f) {

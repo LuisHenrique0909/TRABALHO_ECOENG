@@ -1,12 +1,11 @@
 #ifndef RANKING_H
 #define RANKING_H
 
-#include "Desafio_robo.h"
+#include "Desafio_Robo.h"
 
-// Exibe ranking de um tipo específico de desafio
+// Protótipos das funções
 void mostrar_ranking(TipoDesafio tipo);
-
-// Menu interativo para seleção de ranking
+void mostrar_ranking_geral();  // NOVA FUNÇÃO
 void menu_ranking();
 
 #endif
