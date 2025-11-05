@@ -17,7 +17,6 @@ static int equipe_existe(const char *nome_equipe) {
     char linha[512], nome[100];
     fgets(linha, sizeof(linha), f);
     while (fgets(linha, sizeof(linha), f)) {
-        // CORREÇÃO: Limpar linha antes de processar
         linha[strcspn(linha, "\n")] = '\0';
         linha[strcspn(linha, "\r")] = '\0';
         
@@ -46,7 +45,6 @@ static int participante_em_alguma_equipe(User *participante) {
     snprintf(identificador, sizeof(identificador), "%s:%d", participante->nome, participante->RA);
     
     while (fgets(linha, sizeof(linha), f)) {
-        // CORREÇÃO: Limpar linha antes de buscar
         linha[strcspn(linha, "\n")] = '\0';
         linha[strcspn(linha, "\r")] = '\0';
         
@@ -90,8 +88,6 @@ static void formatar_exibicao_participantes(const char *participantes_csv) {
 
 // Função interna para processar arquivo de equipes (usada por várias funções)
 static Result processar_arquivo_equipes(const char *nome_equipe, User *participante, int operacao) {
-    // operacao: 1 = adicionar, 2 = remover
-    
     FILE *f = abrir_csv("equipes.csv");
     if (!f) return erro(ERRO_ARQUIVO, "Arquivo de equipes inexistente.");
 
@@ -99,51 +95,76 @@ static Result processar_arquivo_equipes(const char *nome_equipe, User *participa
     fgets(linha, sizeof(linha), f);
 
     FILE *temp = fopen("./dados/temp.csv", "w");
+    if (!temp) {
+        fclose(f);
+        return erro(ERRO_ARQUIVO, "Erro ao criar arquivo temporário.");
+    }
+    
     fprintf(temp, "ID_EQUIPE,NOME_EQUIPE,LIDER,PARTICIPANTES\n");
 
     int modificado = 0;
-    int id;
-    char nome[100], lider[100], membros[500];
-
     char identificador_participante[60];
+    
     if (participante) {
         criar_identificador_participante(identificador_participante, sizeof(identificador_participante), participante);
     }
 
     while (fgets(linha, sizeof(linha), f)) {
-        // CORREÇÃO: Limpar linha antes de processar
         linha[strcspn(linha, "\n")] = '\0';
         linha[strcspn(linha, "\r")] = '\0';
         
-        if (sscanf(linha, "%d,%99[^,],%99[^,],%499[^\n]", &id, nome, lider, membros) == 4) {
-
-            if (strcmp(nome, nome_equipe) == 0) {
+        // Pular linhas vazias ou inválidas
+        if (strlen(linha) < 3) {
+            continue;
+        }
+        
+        // Buscar diretamente pelo nome da equipe na linha
+        char *pos_nome_equipe = strstr(linha, nome_equipe);
+        if (pos_nome_equipe != NULL) {
+            int id;
+            char nome[100], lider[100], membros[500];
+            
+            if (sscanf(linha, "%d,%99[^,],%99[^,],%499[^\n]", &id, nome, lider, membros) == 4) {
                 if (operacao == 1) {
                     // Adicionar participante
-                    strcat(membros, ";");
+                    if (strlen(membros) > 0) {
+                        strcat(membros, ";");
+                    }
                     strcat(membros, identificador_participante);
                     modificado = 1;
                 } else if (operacao == 2) {
                     // Remover participante
-                    char buffer[500] = "";
-                    char *token = strtok(membros, ";");
+                    char novo_membros[500] = "";
+                    char copia_membros[500];
+                    strcpy(copia_membros, membros);
+                    
+                    char *token = strtok(copia_membros, ";");
                     int primeiro = 1;
+                    int removido = 0;
                     
                     while (token) {
                         if (strcmp(token, identificador_participante) != 0) {
-                            if (!primeiro) strcat(buffer, ";");
-                            strcat(buffer, token);
+                            if (!primeiro) strcat(novo_membros, ";");
+                            strcat(novo_membros, token);
                             primeiro = 0;
                         } else {
-                            modificado = 1;
+                            removido = 1;
                         }
                         token = strtok(NULL, ";");
                     }
-                    strcpy(membros, buffer);
+                    
+                    if (removido) {
+                        strcpy(membros, novo_membros);
+                        modificado = 1;
+                    }
                 }
+                
+                fprintf(temp, "%d,%s,%s,%s\n", id, nome, lider, membros);
             }
+        } else {
+            // Manter linha original sem processamento
+            fprintf(temp, "%s\n", linha);
         }
-        fprintf(temp, "%d,%s,%s,%s\n", id, nome, lider, membros);
     }
 
     fclose(f);
@@ -151,7 +172,9 @@ static Result processar_arquivo_equipes(const char *nome_equipe, User *participa
 
     if (modificado) {
         remove("./dados/equipes.csv");
-        rename("./dados/temp.csv", "./dados/equipes.csv");
+        if (rename("./dados/temp.csv", "./dados/equipes.csv") != 0) {
+            return erro(ERRO_ARQUIVO, "Erro ao atualizar arquivo de equipes.");
+        }
         return ok();
     } else {
         remove("./dados/temp.csv");
@@ -169,30 +192,26 @@ Result cadastrar_equipe(User *lider) {
 
     criar_diretorio_dados();
 
-    // Verifica se o líder já tem equipe
     if (participante_em_alguma_equipe(lider))
         return erro(ERRO_LOGICA, "Você já está em uma equipe.");
 
     Equipe e;
     
-    // CORREÇÃO: Buscar o maior ID existente + 1 em vez de contar linhas
+    // Buscar o maior ID existente + 1
     int max_id = -1;
     FILE *f_ler = abrir_csv("equipes.csv");
     if (f_ler) {
         char linha[512];
-        fgets(linha, sizeof(linha), f_ler); // Pular cabeçalho
+        fgets(linha, sizeof(linha), f_ler);
         int id_temp;
-        char temp[100];
         while (fgets(linha, sizeof(linha), f_ler)) {
-            linha[strcspn(linha, "\n")] = '\0';
-            linha[strcspn(linha, "\r")] = '\0';
-            if (sscanf(linha, "%d,%99[^,]", &id_temp, temp) == 2) {
-                if (id_temp > max_id) max_id = id_temp;
+            if (sscanf(linha, "%d,", &id_temp) == 1 && id_temp > max_id) {
+                max_id = id_temp;
             }
         }
         fclose(f_ler);
     }
-    e.id_equipe = max_id + 1;
+    e.id_equipe = (max_id == -1) ? 0 : max_id + 1;
     
     strcpy(e.nome_lider, lider->nome);
 
@@ -201,7 +220,6 @@ Result cadastrar_equipe(User *lider) {
     fgets(e.nome_equipe, sizeof(e.nome_equipe), stdin);
     e.nome_equipe[strcspn(e.nome_equipe, "\n")] = '\0';
 
-    // CORREÇÃO: Validar nome da equipe
     if (strlen(e.nome_equipe) == 0) {
         return erro(ERRO_INVALIDO, "Nome da equipe não pode estar vazio.");
     }
@@ -209,20 +227,12 @@ Result cadastrar_equipe(User *lider) {
     if (equipe_existe(e.nome_equipe))
         return erro(ERRO_LOGICA, "Já existe uma equipe com esse nome.");
 
-    // Líder é o primeiro integrante
     criar_identificador_participante(e.participantes, sizeof(e.participantes), lider);
 
     FILE *f = escrever_no_csv("equipes.csv", "ID_EQUIPE,NOME_EQUIPE,LIDER,PARTICIPANTES\n");
     if (!f) return erro(ERRO_ARQUIVO, "Erro ao abrir arquivo de equipes.");
 
-    // CORREÇÃO: Verificar se a gravação foi bem sucedida
-    int resultado = fprintf(f, "%d,%s,%s,%s\n", e.id_equipe, e.nome_equipe, e.nome_lider, e.participantes);
-    
-    if (resultado < 0) {
-        fclose(f);
-        return erro(ERRO_ARQUIVO, "Erro ao gravar dados no arquivo.");
-    }
-    
+    fprintf(f, "%d,%s,%s,%s\n", e.id_equipe, e.nome_equipe, e.nome_lider, e.participantes);
     fclose(f);
 
     printf("Equipe '%s' criada com sucesso! (ID: %d)\n", e.nome_equipe, e.id_equipe);
@@ -265,7 +275,6 @@ void listar_equipes() {
     int count = 0;
 
     while (fgets(linha, sizeof(linha), f)) {
-        // CORREÇÃO: Limpar linha antes de processar
         linha[strcspn(linha, "\n")] = '\0';
         linha[strcspn(linha, "\r")] = '\0';
         
@@ -309,17 +318,14 @@ void exibir_equipe_do_participante(User *usuario) {
     int id;
     char nome[100], lider[100], membros[500];
 
-    // Criar identificador do usuário no formato "nome:ra"
     char identificador_usuario[60];
     criar_identificador_participante(identificador_usuario, sizeof(identificador_usuario), usuario);
 
     while (fgets(linha, sizeof(linha), f)) {
-        // Limpar quebras de linha
         linha[strcspn(linha, "\n")] = '\0';
         linha[strcspn(linha, "\r")] = '\0';
         
         if (sscanf(linha, "%d,%99[^,],%99[^,],%499[^\n]", &id, nome, lider, membros) == 4) {
-            // Verificar se o usuário está na lista de membros
             if (strstr(membros, identificador_usuario)) {
                 printf("\n=== SUA EQUIPE ===\n");
                 printf("────────────────────────────────────────\n");
