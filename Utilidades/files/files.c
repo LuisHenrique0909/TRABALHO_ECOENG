@@ -55,7 +55,7 @@ FILE* escrever_no_csv(const char *arquivo, const char *cabecalho) {
     if (!f) return NULL;
 
     if (!existe && cabecalho != NULL)
-        fprintf(f, "%s", cabecalho);
+        fprintf(f, "%s\n", cabecalho);
 
     return f;
 }

@@ -27,7 +27,7 @@ void inicializar_admin() {
         char linha[256];
         fgets(linha, sizeof(linha), f); // cabeçalho
         while (fgets(linha, sizeof(linha), f)) {
-            if (strstr(linha, ",Admin,0,")) {
+            if (strstr(linha, "0,Admin,0,")) {
                 existe = 1;
                 break;
             }
@@ -36,7 +36,7 @@ void inicializar_admin() {
     }
 
     if (!existe) {
-        FILE *fw = escrever_no_csv("users.csv", "ID,NOME,CARGO,SENHA");
+        FILE *fw = escrever_no_csv("users.csv", "RA,NOME,CARGO,SENHA");
         fprintf(fw, "0,Admin,0,admin123\n");
         fclose(fw);
     }
@@ -53,7 +53,7 @@ void inicializar_avaliador() {
         char linha[256];
         fgets(linha, sizeof(linha), f); // cabeçalho
         while (fgets(linha, sizeof(linha), f)) {
-            if (strstr(linha, ",Avaliador,2,")) {
+            if (strstr(linha, "1,Avaliador,2,")) {
                 existe = 1;
                 break;
             }
@@ -62,7 +62,7 @@ void inicializar_avaliador() {
     }
 
     if (!existe) {
-        FILE *fw = escrever_no_csv("users.csv", "ID,NOME,CARGO,SENHA");
+        FILE *fw = escrever_no_csv("users.csv", "RA,NOME,CARGO,SENHA");
         fprintf(fw, "1,Avaliador,2,avaliador123\n");
         fclose(fw);
     }
@@ -95,14 +95,18 @@ void singin() {
     FILE *f = abrir_csv("users.csv");
     if (f) {
         char linha[256];
-        int id_existente;
+        int RA_csv, cargo_temp;
+        char nome_temp[50], senha_temp[50];
+        
         fgets(linha, sizeof(linha), f); // cabeçalho
         while (fgets(linha, sizeof(linha), f)) {
-            sscanf(linha, "%d,", &id_existente);
-            if (id_existente == u.RA) {
-                fclose(f);
-                printf("Já existe um usuário com esse RA.\n");
-                return;
+            // Lê todos os campos para garantir parsing correto
+            if (sscanf(linha, "%d,%49[^,],%d,%49[^\n]", &RA_csv, nome_temp, &cargo_temp, senha_temp) == 4) {
+                if (RA_csv == u.RA) {
+                    fclose(f);
+                    printf("Já existe um usuário com esse RA.\n");
+                    return;
+                }
             }
         }
         fclose(f);
@@ -120,9 +124,22 @@ void singin() {
 // Registra usuário no CSV (modo append, persistente)
 // ================================================================
 Result cadastrar_user(User *u) {
-    FILE *f = escrever_no_csv("users.csv", "RA,NOME,CARGO,SENHA");
-    if (!f) return erro(ERRO_ARQUIVO, "Erro ao abrir users.csv");
-
+    // Use fopen diretamente para melhor controle
+    FILE *f = fopen("./dados/users.csv", "a");
+    if (!f) {
+        f = fopen("./dados/users.csv", "w");
+        if (!f) return erro(ERRO_ARQUIVO, "Erro ao criar users.csv");
+        fprintf(f, "RA,NOME,CARGO,SENHA\n");
+    } else {
+        // Verifica se o arquivo está vazio (apenas criado)
+        fseek(f, 0, SEEK_END);
+        long pos = ftell(f);
+        if (pos == 0) {
+            fprintf(f, "RA,NOME,CARGO,SENHA\n");
+        }
+        fseek(f, 0, SEEK_END); // Volta para o final
+    }
+    
     fprintf(f, "%d,%s,%d,%s\n", u->RA, u->nome, u->cargo, u->senha);
     fclose(f);
     return ok();
