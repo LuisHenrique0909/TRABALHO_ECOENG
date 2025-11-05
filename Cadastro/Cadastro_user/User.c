@@ -77,15 +77,15 @@ void singin() {
     inicializar_avaliador();
 
     printf("\n--- Cadastro de Participante ---\n");
-    printf("Nome completo: \n");
+    printf("Nome completo: ");
     fgets(u.nome, sizeof(u.nome), stdin);
     limpar_linha(u.nome);
 
-    printf("RA: \n");
+    printf("RA: ");
     scanf("%d", &u.RA);
     getchar();
 
-    printf("Senha: \n");
+    printf("Senha: ");
     fgets(u.senha, sizeof(u.senha), stdin);
     limpar_linha(u.senha);
 
