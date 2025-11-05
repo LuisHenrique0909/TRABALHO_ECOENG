@@ -45,6 +45,9 @@ void listar_todos_usuarios() {
     FILE *f = abrir_csv("users.csv");
     if (!f) {
         printf("Nenhum usuário encontrado.\n");
+        // PAUSA
+        printf("\nPressione ENTER para voltar...");
+        getchar();
         return;
     }
 
@@ -70,6 +73,10 @@ void listar_todos_usuarios() {
     printf("────────────────────────────────────────\n");
     printf("Total de usuários: %d\n", count);
     fclose(f);
+    
+    // PAUSA
+    printf("\nPressione ENTER para voltar...");
+    getchar();
 }
 
 // ============================================================================

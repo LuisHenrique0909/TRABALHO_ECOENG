@@ -263,6 +263,9 @@ void listar_equipes() {
     FILE *f = abrir_csv("equipes.csv");
     if (!f) {
         printf("Nenhuma equipe cadastrada.\n");
+        // PAUSA
+        printf("\nPressione ENTER para voltar...");
+        getchar();
         return;
     }
 
@@ -296,6 +299,10 @@ void listar_equipes() {
     }
 
     fclose(f);
+    
+    // PAUSA
+    printf("\nPressione ENTER para voltar...");
+    getchar();
 }
 
 // Exibe a equipe e integrantes do usuário logado

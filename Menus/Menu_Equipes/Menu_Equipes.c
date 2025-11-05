@@ -112,6 +112,9 @@ void mostrar_pontuacao_da_equipe(User *usuario) {
     FILE *f_eq = abrir_csv("equipes.csv");
     if (!f_eq) {
         printf("Nenhuma equipe cadastrada.\n");
+        // PAUSA
+        printf("\nPressione ENTER para voltar ao menu...");
+        getchar();
         return;
     }
 
@@ -121,7 +124,6 @@ void mostrar_pontuacao_da_equipe(User *usuario) {
     char nome_equipe[100] = "";
     int id_equipe = -1;
 
-    // Busca a equipe do participante usando identificador Nome:RA
     char identificador_usuario[60];
     snprintf(identificador_usuario, sizeof(identificador_usuario), "%s:%d", usuario->nome, usuario->RA);
 
@@ -140,12 +142,18 @@ void mostrar_pontuacao_da_equipe(User *usuario) {
 
     if (id_equipe == -1) {
         printf("\nVocê ainda não faz parte de nenhuma equipe.\n");
+        // PAUSA
+        printf("\nPressione ENTER para voltar ao menu...");
+        getchar();
         return;
     }
 
     FILE *f_res = abrir_csv("resultados_robo.csv");
     if (!f_res) {
         printf("Nenhuma pontuação registrada ainda.\n");
+        // PAUSA
+        printf("\nPressione ENTER para voltar ao menu...");
+        getchar();
         return;
     }
 
@@ -180,4 +188,8 @@ void mostrar_pontuacao_da_equipe(User *usuario) {
     }
 
     fclose(f_res);
+    
+    // PAUSA
+    printf("\nPressione ENTER para voltar ao menu...");
+    getchar();
 }
