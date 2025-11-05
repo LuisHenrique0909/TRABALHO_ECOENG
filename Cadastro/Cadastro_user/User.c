@@ -27,7 +27,7 @@ void inicializar_admin() {
         char linha[256];
         fgets(linha, sizeof(linha), f); // cabeçalho
         while (fgets(linha, sizeof(linha), f)) {
-            if (strstr(linha, "Admin,0,")) {
+            if (strstr(linha, ",Admin,0,")) {
                 existe = 1;
                 break;
             }
@@ -53,7 +53,7 @@ void inicializar_avaliador() {
         char linha[256];
         fgets(linha, sizeof(linha), f); // cabeçalho
         while (fgets(linha, sizeof(linha), f)) {
-            if (strstr(linha, "Avaliador,2,")) {
+            if (strstr(linha, ",Avaliador,2,")) {
                 existe = 1;
                 break;
             }
@@ -81,7 +81,7 @@ void singin() {
     fgets(u.nome, sizeof(u.nome), stdin);
     limpar_linha(u.nome);
 
-    printf("RA (número): \n");
+    printf("RA: \n");
     scanf("%d", &u.RA);
     getchar();
 
@@ -138,14 +138,15 @@ User* login_user() {
         return NULL;
     }
 
-    char nome[50], senha[50], RA[8];
+    char nome[50], senha[50];
+    int RA_input;
     printf("\n--- LOGIN ---\n");
     printf("Nome: ");
     fgets(nome, sizeof(nome), stdin);
     limpar_linha(nome);
     printf("RA: ");
-    fgets(RA, sizeof(RA), stdin);
-    limpar_linha(RA);
+    scanf("%d", &RA_input);
+    getchar();
     printf("Senha: ");
     fgets(senha, sizeof(senha), stdin);
     limpar_linha(senha);
@@ -153,31 +154,42 @@ User* login_user() {
     char linha[256];
     fgets(linha, sizeof(linha), f); // pula cabeçalho
 
-    User *u = malloc(sizeof(User));
-    int RA_csv, cargo;
+    User *u = NULL;
     int logado = 0;
 
     while (fgets(linha, sizeof(linha), f)) {
-        char nome_csv[50], senha_csv[50], RA_csv[7];
-        sscanf(linha, "%d,%49[^,],%d,%49[^,],%7[^,\n]", &RA_csv, nome_csv, &cargo, senha_csv);
-
-        if (strcmp(nome_csv, nome) == 0 && strcmp(senha_csv, senha) == 0 && strcmp(RA_csv, RA) == 0) {
-            u->RA = atoi(RA_csv);
-            strcpy(u->nome, nome_csv);
-            u->cargo = cargo;
-            strcpy(u->senha, senha_csv);
-            logado = 1;
-            break;
+        int RA_csv, cargo_csv;
+        char nome_csv[50], senha_csv[50];
+        
+        // CORREÇÃO: Formato consistente - RA é inteiro no CSV
+        if (sscanf(linha, "%d,%49[^,],%d,%49[^\n]", &RA_csv, nome_csv, &cargo_csv, senha_csv) == 4) {
+            
+            if (RA_csv == RA_input && 
+                strcmp(nome_csv, nome) == 0 && 
+                strcmp(senha_csv, senha) == 0) {
+                
+                // Aloca memória apenas quando encontrar usuário válido
+                u = malloc(sizeof(User));
+                if (u) {
+                    u->RA = RA_csv;
+                    strcpy(u->nome, nome_csv);
+                    u->cargo = (Cargo)cargo_csv;
+                    strcpy(u->senha, senha_csv);
+                    logado = 1;
+                }
+                break;
+            }
         }
     }
     fclose(f);
 
     if (!logado) {
         printf("Nome, RA ou senha incorretos.\n");
-        free(u);
+        // Não faz free(u) aqui porque u só é alocado se logado=1
         return NULL;
     }
 
     printf("Login realizado com sucesso!\n");
+    printf("Bem-vindo, %s! (%s)\n", u->nome, cargo_pra_texto(u->cargo));
     return u;
 }
