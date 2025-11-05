@@ -345,4 +345,8 @@ void exibir_equipe_do_participante(User *usuario) {
     if (!encontrado) {
         printf("\nVocê ainda não está em nenhuma equipe.\n");
     }
+
+    // CORREÇÃO: Pausa antes de voltar ao menu
+    printf("\nPressione ENTER para voltar ao menu...");
+    getchar();
 }
