@@ -1,58 +1,43 @@
+/* main.c
+ * Ponto de entrada do Sistema ECOENG
+ * - Garante diretório ./dados
+ * - Inicializa usuários padrão (admin/avaliador)
+ * - Inicia o menu principal (login/redirecionamento)
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <locale.h>
+
+#include "Menu_Principal.h"
+#include "Files.h"
 #include "User.h"
-#include "Result.h"
 
-void menu() {
-    printf("\n====================================\n");
-    printf("        SISTEMA ECOENG CADASTRO     \n");
-    printf("====================================\n");
-    printf("1 - Cadastrar usuário\n");
-    printf("2 - Autorizar usuário (Admin)\n");
-    printf("0 - Sair\n");
-    printf("====================================\n");
-    printf("Escolha uma opção: ");
-}
+int main(void) {
+    /* Ajuste de locale para evitar problemas com acentuação no Windows.
+       Se preferir, remova ou altere conforme seu ambiente. */
+#ifdef _WIN32
+    setlocale(LC_ALL, "Portuguese_Brazil.1252");
+#else
+    setlocale(LC_ALL, "");
+#endif
 
-int main() {
-    int opcao;
-    inicializar_admin(); // garante que o admin Luis Henrique existe
+    printf("==============================================\n");
+    printf("   SISTEMA DE GERENCIAMENTO DO EVENTO ECOENG  \n");
+    printf("==============================================\n\n");
 
-    do {
-        menu();
-        scanf("%d", &opcao);
-        getchar(); // limpa o buffer do teclado
+    /* Garante que a pasta de dados exista (./dados/) */
+    criar_diretorio_dados();
 
-        switch (opcao) {
-            case 1:
-                printf("\n--- CADASTRAR USUÁRIO ---\n");
-                singin();
-                break;
+    /* Inicializa contas padrão se necessário */
+    inicializar_admin();
+    inicializar_avaliador();
 
-            case 2: {
-                int id_autorizar;
-                printf("\n--- AUTORIZAR USUÁRIO ---\n");
-                printf("Digite o ID do usuário que deseja autorizar: ");
-                scanf("%d", &id_autorizar);
-                getchar();
+    /* Inicia loop principal do sistema (login / redirecionamento) */
+    menu_principal();
 
-                Result r = autorizar_user(id_autorizar);
-                if (r.code == OK)
-                    printf("Usuário autorizado com sucesso!\n");
-                else
-                    print_err(&r);
-                break;
-            }
-
-            case 0:
-                printf("Saindo do sistema...\n");
-                break;
-
-            default:
-                printf("Opção inválida, tente novamente.\n");
-        }
-
-    } while (opcao != 0);
-
+    printf("\n==============================================\n");
+    printf("Sistema encerrado. Até mais.\n");
+    printf("==============================================\n");
     return 0;
 }
