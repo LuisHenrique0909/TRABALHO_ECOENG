@@ -2,16 +2,12 @@
 #include "Desafio_robo.h"
 #include "Cadastro_Equipes.h"
 #include "Ranking.h"
+#include "pausar_sistema.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
 
-// Função auxiliar para pausa padronizada
-void pausar_sistema() {
-    printf("\nPressione ENTER para continuar...");
-    getchar();
-}
 
 void menu_avaliador() {
     printf("\n===== MENU AVALIADOR =====\n");

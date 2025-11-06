@@ -3,15 +3,10 @@
 #include "Pontuacao.h"
 #include "Ranking.h"
 #include "Cadastro_Equipes.h"
+#include "pausar_sistema.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-// Função auxiliar para pausa padronizada
-void pausar_sistema() {
-    printf("\nPressione ENTER para continuar...");
-    getchar();
-}
 
 // ============================================================================
 // Função principal do menu do administrador

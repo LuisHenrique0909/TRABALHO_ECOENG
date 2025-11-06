@@ -1,14 +1,9 @@
 #include "Menu_Equipes.h"
 #include "Files.h"
+#include "pausar_sistema.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-// Função auxiliar para pausa padronizada
-void pausar_sistema() {
-    printf("\nPressione ENTER para continuar...");
-    getchar();
-}
 
 // ================================================================
 // Menu principal do participante

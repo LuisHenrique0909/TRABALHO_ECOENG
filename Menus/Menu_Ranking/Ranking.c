@@ -1,14 +1,9 @@
 #include "Ranking.h"
 #include "Files.h"
+#include "pausar_sistema.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-// Função auxiliar para pausa padronizada
-void pausar_sistema() {
-    printf("\nPressione ENTER para continuar...");
-    getchar();
-}
 
 // Estrutura interna para manipulação de ranking
 typedef struct {
@@ -213,9 +208,6 @@ void mostrar_ranking_geral() {
     }
 }
 
-// ------------------------------------------------------------
-// Menu de ranking interativo (usado por admin, avaliador e equipe)
-// ------------------------------------------------------------
 // ------------------------------------------------------------
 // Menu de ranking interativo (usado por admin, avaliador e equipe)
 // ------------------------------------------------------------

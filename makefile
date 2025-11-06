@@ -22,7 +22,8 @@ CFLAGS = -Wall -g \
 	-IMenus/Menu_Avaliador \
 	-IMenus/Menu_admin \
 	-IUtilidades/FILES \
-	-IUtilidades/Result
+	-IUtilidades/Result \
+	-IUtilidades/pausar_sistema
 
 # Pasta de build intermediária
 BUILD_DIR = build
@@ -47,7 +48,8 @@ SRC = main.c \
       $(wildcard Menus/Menu_Ranking/*.c) \
       $(wildcard Menus/Menu_Avaliador/*.c) \
       $(wildcard Utilidades/FILES/*.c) \
-      $(wildcard Utilidades/Result/*.c)
+      $(wildcard Utilidades/Result/*.c) \
+	  $(wildcard Utilidades/pausar_sistema/*.c)
 
 OBJ = $(patsubst %.c,$(BUILD_DIR)/%.o,$(SRC))
 
@@ -85,6 +87,7 @@ prepare:
 	@mkdir "$(BUILD_DIR)\Menus\Menu_Avaliador" 2>nul || echo.
 	@mkdir "$(BUILD_DIR)\Utilidades\FILES" 2>nul || echo.
 	@mkdir "$(BUILD_DIR)\Utilidades\Result" 2>nul || echo.
+	@mkdir "$(BUILD_DIR)\Utilidades\pausar_sistema" 2>nul || echo.
 	@if not exist $(BIN_DIR) mkdir $(BIN_DIR)
 
 # ==========================
