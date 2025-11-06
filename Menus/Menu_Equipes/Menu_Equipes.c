@@ -4,6 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Função auxiliar para pausa padronizada
+void pausar_sistema() {
+    printf("\nPressione ENTER para continuar...");
+    getchar();
+}
+
 // ================================================================
 // Menu principal do participante
 // ================================================================
@@ -13,96 +19,103 @@ void menu_equipe(User *usuario) {
         return;
     }
 
+    printf("\n===== MENU EQUIPE =====\n");
+    printf("1 - Criar nova equipe\n");
+    printf("2 - Visualizar minha equipe e integrantes\n");
+    printf("3 - Adicionar participante à minha equipe (somente líder)\n");
+    printf("4 - Remover participante da minha equipe (somente líder)\n");
+    printf("5 - Ver pontuação da minha equipe\n");
+    printf("6 - Ver ranking geral\n");
+    printf("0 - Sair\n");
+    printf("Escolha: ");
+    
     int opc;
-    do {
-        printf("\n===== MENU EQUIPE =====\n");
-        printf("1 - Criar nova equipe\n");
-        printf("2 - Visualizar minha equipe e integrantes\n");
-        printf("3 - Adicionar participante à minha equipe (somente líder)\n");
-        printf("4 - Remover participante da minha equipe (somente líder)\n");
-        printf("5 - Ver pontuação da minha equipe\n");
-        printf("6 - Ver ranking geral\n");
-        printf("0 - Sair\n");
-        printf("Escolha: ");
-        scanf("%d", &opc);
-        getchar();
+    scanf("%d", &opc);
+    getchar();
 
-        switch (opc) {
-            case 1:
-                cadastrar_equipe(usuario);
-                break;
-            case 2:
-                exibir_equipe_do_participante(usuario);
-                break;
-            case 3: {
-                char nome_equipe[100], nome_participante[100];
-                int ra_participante;
-                
-                printf("Nome da equipe: ");
-                fgets(nome_equipe, sizeof(nome_equipe), stdin);
-                nome_equipe[strcspn(nome_equipe, "\n")] = '\0';
+    switch (opc) {
+        case 1:
+            cadastrar_equipe(usuario);
+            pausar_sistema();
+            break;
+        case 2:
+            exibir_equipe_do_participante(usuario);
+            pausar_sistema();
+            break;
+        case 3: {
+            char nome_equipe[100], nome_participante[100];
+            int ra_participante;
+            
+            printf("Nome da equipe: ");
+            fgets(nome_equipe, sizeof(nome_equipe), stdin);
+            nome_equipe[strcspn(nome_equipe, "\n")] = '\0';
 
-                printf("Nome do participante para adicionar: ");
-                fgets(nome_participante, sizeof(nome_participante), stdin);
-                nome_participante[strcspn(nome_participante, "\n")] = '\0';
+            printf("Nome do participante para adicionar: ");
+            fgets(nome_participante, sizeof(nome_participante), stdin);
+            nome_participante[strcspn(nome_participante, "\n")] = '\0';
 
-                printf("RA do participante: ");
-                scanf("%d", &ra_participante);
-                getchar();
+            printf("RA do participante: ");
+            scanf("%d", &ra_participante);
+            getchar();
 
-                // Criar objeto User temporário para o participante
-                User participante;
-                strcpy(participante.nome, nome_participante);
-                participante.RA = ra_participante;
+            // Criar objeto User temporário para o participante
+            User participante;
+            strcpy(participante.nome, nome_participante);
+            participante.RA = ra_participante;
 
-                Result r = adicionar_participante_equipe(nome_equipe, &participante);
-                if (r.code == OK)
-                    printf("Participante adicionado com sucesso!\n");
-                else
-                    print_err(&r);
-                break;
-            }
-            case 4: {
-                char nome_equipe[100], nome_participante[100];
-                int ra_participante;
-                
-                printf("Nome da equipe: ");
-                fgets(nome_equipe, sizeof(nome_equipe), stdin);
-                nome_equipe[strcspn(nome_equipe, "\n")] = '\0';
-
-                printf("Nome do participante para remover: ");
-                fgets(nome_participante, sizeof(nome_participante), stdin);
-                nome_participante[strcspn(nome_participante, "\n")] = '\0';
-
-                printf("RA do participante: ");
-                scanf("%d", &ra_participante);
-                getchar();
-
-                // Criar objeto User temporário para o participante
-                User participante;
-                strcpy(participante.nome, nome_participante);
-                participante.RA = ra_participante;
-
-                Result r = remover_participante_equipe(nome_equipe, &participante);
-                if (r.code == OK)
-                    printf("Participante removido com sucesso!\n");
-                else
-                    print_err(&r);
-                break;
-            }
-            case 5:
-                mostrar_pontuacao_da_equipe(usuario);
-                break;
-            case 6:
-                menu_ranking();
-                break;
-            case 0:
-                printf("Saindo do menu de equipe...\n");
-                break;
-            default:
-                printf("Opção inválida.\n");
+            Result r = adicionar_participante_equipe(nome_equipe, &participante);
+            if (r.code == OK)
+                printf("Participante adicionado com sucesso!\n");
+            else
+                print_err(&r);
+            pausar_sistema();
+            break;
         }
-    } while (opc != 0);
+        case 4: {
+            char nome_equipe[100], nome_participante[100];
+            int ra_participante;
+            
+            printf("Nome da equipe: ");
+            fgets(nome_equipe, sizeof(nome_equipe), stdin);
+            nome_equipe[strcspn(nome_equipe, "\n")] = '\0';
+
+            printf("Nome do participante para remover: ");
+            fgets(nome_participante, sizeof(nome_participante), stdin);
+            nome_participante[strcspn(nome_participante, "\n")] = '\0';
+
+            printf("RA do participante: ");
+            scanf("%d", &ra_participante);
+            getchar();
+
+            // Criar objeto User temporário para o participante
+            User participante;
+            strcpy(participante.nome, nome_participante);
+            participante.RA = ra_participante;
+
+            Result r = remover_participante_equipe(nome_equipe, &participante);
+            if (r.code == OK)
+                printf("Participante removido com sucesso!\n");
+            else
+                print_err(&r);
+            pausar_sistema();
+            break;
+        }
+        case 5:
+            mostrar_pontuacao_da_equipe(usuario);
+            break;
+        case 6:
+            menu_ranking();
+            break;
+        case 0:
+            printf("Saindo do menu de equipe...\n");
+            return;
+        default:
+            printf("Opção inválida.\n");
+            pausar_sistema();
+            break;
+    }
+
+    return menu_equipe(usuario);
 }
 
 // ================================================================
@@ -112,9 +125,7 @@ void mostrar_pontuacao_da_equipe(User *usuario) {
     FILE *f_eq = abrir_csv("equipes.csv");
     if (!f_eq) {
         printf("Nenhuma equipe cadastrada.\n");
-        // PAUSA
-        printf("\nPressione ENTER para voltar ao menu...");
-        getchar();
+        pausar_sistema();
         return;
     }
 
@@ -142,18 +153,14 @@ void mostrar_pontuacao_da_equipe(User *usuario) {
 
     if (id_equipe == -1) {
         printf("\nVocê ainda não faz parte de nenhuma equipe.\n");
-        // PAUSA
-        printf("\nPressione ENTER para voltar ao menu...");
-        getchar();
+        pausar_sistema();
         return;
     }
 
     FILE *f_res = abrir_csv("resultados_robo.csv");
     if (!f_res) {
         printf("Nenhuma pontuação registrada ainda.\n");
-        // PAUSA
-        printf("\nPressione ENTER para voltar ao menu...");
-        getchar();
+        pausar_sistema();
         return;
     }
 
@@ -189,7 +196,5 @@ void mostrar_pontuacao_da_equipe(User *usuario) {
 
     fclose(f_res);
     
-    // PAUSA
-    printf("\nPressione ENTER para voltar ao menu...");
-    getchar();
+    pausar_sistema();
 }

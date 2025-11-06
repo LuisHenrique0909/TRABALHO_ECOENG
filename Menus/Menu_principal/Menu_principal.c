@@ -7,6 +7,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Função auxiliar para pausa padronizada
+void pausar_sistema() {
+    printf("\nPressione ENTER para continuar...");
+    getchar();
+}
+
 // ========================== LOGIN E MENU PRINCIPAL ==========================
 
 void menu_principal() {
@@ -78,5 +84,6 @@ void menu_principal() {
             break;
     }
 
+    pausar_sistema();
     return menu_principal();
 }

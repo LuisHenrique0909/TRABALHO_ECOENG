@@ -4,6 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Função auxiliar para pausa padronizada
+void pausar_sistema() {
+    printf("\nPressione ENTER para continuar...");
+    getchar();
+}
+
 // Estrutura interna para manipulação de ranking
 typedef struct {
     int id;
@@ -210,33 +216,42 @@ void mostrar_ranking_geral() {
 // ------------------------------------------------------------
 // Menu de ranking interativo (usado por admin, avaliador e equipe)
 // ------------------------------------------------------------
+// ------------------------------------------------------------
+// Menu de ranking interativo (usado por admin, avaliador e equipe)
+// ------------------------------------------------------------
 void menu_ranking() {
+    printf("\n===== MENU RANKING =====\n");
+    printf("1 - Ver Ranking Robô Sumô\n");
+    printf("2 - Ver Ranking Robô Seguidor de Linha\n");
+    printf("3 - Ver Ranking Geral (Todos os Desafios)\n");
+    printf("0 - Voltar\n");
+    printf("Escolha: ");
+    
     int opc;
-    do {
-        printf("\n===== MENU RANKING =====\n");
-        printf("1 - Ver Ranking Robô Sumô\n");
-        printf("2 - Ver Ranking Robô Seguidor de Linha\n");
-        printf("3 - Ver Ranking Geral (Todos os Desafios)\n");
-        printf("0 - Voltar\n");
-        printf("Escolha: ");
-        scanf("%d", &opc);
-        getchar();
+    scanf("%d", &opc);
+    getchar();
 
-        switch (opc) {
-            case 1:
-                mostrar_ranking(SUMO);
-                break;
-            case 2:
-                mostrar_ranking(SEGUIDOR_LINHA);
-                break;
-            case 3:
-                mostrar_ranking_geral();
-                break;
-            case 0:
-                printf("Voltando ao menu anterior...\n");
-                break;
-            default:
-                printf("Opção inválida.\n");
-        }
-    } while (opc != 0);
+    switch (opc) {
+        case 1:
+            mostrar_ranking(SUMO);
+            pausar_sistema();
+            break;
+        case 2:
+            mostrar_ranking(SEGUIDOR_LINHA);
+            pausar_sistema();
+            break;
+        case 3:
+            mostrar_ranking_geral();
+            pausar_sistema();
+            break;
+        case 0:
+            printf("Voltando ao menu anterior...\n");
+            return;
+        default:
+            printf("Opção inválida.\n");
+            pausar_sistema();
+            break;
+    }
+
+    return menu_ranking();
 }

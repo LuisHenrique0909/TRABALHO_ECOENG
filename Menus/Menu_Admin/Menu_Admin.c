@@ -2,40 +2,69 @@
 #include "Files.h"
 #include "Pontuacao.h"
 #include "Ranking.h"
-#include "Cadastro_Equipes.h"  // Incluído para usar listar_equipes()
+#include "Cadastro_Equipes.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+// Função auxiliar para pausa padronizada
+void pausar_sistema() {
+    printf("\nPressione ENTER para continuar...");
+    getchar();
+}
 
 // ============================================================================
 // Função principal do menu do administrador
 // ============================================================================
 void menu_admin() {
+    printf("\n===== MENU ADMINISTRADOR =====\n");
+    printf("1 - Listar todos os usuários\n");
+    printf("2 - Deletar usuário\n");
+    printf("3 - Listar todas as equipes\n");
+    printf("4 - Deletar equipe\n");
+    printf("5 - Alterar pontuação de equipe\n");
+    printf("6 - Visualizar ranking geral\n");
+    printf("0 - Sair\n");
+    printf("Escolha: ");
+    
     int opc;
-    do {
-        printf("\n===== MENU ADMINISTRADOR =====\n");
-        printf("1 - Listar todos os usuários\n");
-        printf("2 - Deletar usuário\n");
-        printf("3 - Listar todas as equipes\n");
-        printf("4 - Deletar equipe\n");
-        printf("5 - Alterar pontuação de equipe\n");
-        printf("6 - Visualizar ranking geral\n");
-        printf("0 - Sair\n");
-        printf("Escolha: ");
-        scanf("%d", &opc);
-        getchar();
+    scanf("%d", &opc);
+    getchar();
 
-        switch (opc) {
-            case 1: listar_todos_usuarios(); break;
-            case 2: deletar_usuario(); break;
-            case 3: listar_equipes(); break;  // Agora usa a função otimizada
-            case 4: deletar_equipe(); break;
-            case 5: alterar_pontuacao_equipe(); break;
-            case 6: menu_ranking(); break;
-            case 0: printf("Saindo do menu do administrador...\n"); break;
-            default: printf("Opção inválida.\n");
-        }
-    } while (opc != 0);
+    switch (opc) {
+        case 1: 
+            listar_todos_usuarios(); 
+            pausar_sistema();
+            break;
+        case 2: 
+            deletar_usuario(); 
+            pausar_sistema();
+            break;
+        case 3: 
+            listar_equipes();
+            pausar_sistema();
+            break;
+        case 4: 
+            deletar_equipe(); 
+            pausar_sistema();
+            break;
+        case 5: 
+            alterar_pontuacao_equipe(); 
+            pausar_sistema();
+            break;
+        case 6: 
+            menu_ranking(); 
+            break;
+        case 0: 
+            printf("Saindo do menu do administrador...\n");
+            return;
+        default: 
+            printf("Opção inválida.\n");
+            pausar_sistema();
+            break;
+    }
+
+    return menu_admin();
 }
 
 // ============================================================================
@@ -45,9 +74,6 @@ void listar_todos_usuarios() {
     FILE *f = abrir_csv("users.csv");
     if (!f) {
         printf("Nenhum usuário encontrado.\n");
-        // PAUSA
-        printf("\nPressione ENTER para voltar...");
-        getchar();
         return;
     }
 
@@ -73,10 +99,6 @@ void listar_todos_usuarios() {
     printf("────────────────────────────────────────\n");
     printf("Total de usuários: %d\n", count);
     fclose(f);
-    
-    // PAUSA
-    printf("\nPressione ENTER para voltar...");
-    getchar();
 }
 
 // ============================================================================
@@ -129,7 +151,7 @@ void deletar_usuario() {
 // 4. Deletar equipe
 // ============================================================================
 void deletar_equipe() {
-    listar_equipes();  // Usa a nova formatação otimizada
+    listar_equipes();
     
     printf("\nDigite o ID da equipe que deseja deletar: ");
     int id_alvo;
@@ -154,8 +176,8 @@ void deletar_equipe() {
     while (fgets(linha, sizeof(linha), f)) {
         sscanf(linha, "%d,%99[^,],%49[^,],%499[^\n]", &id, nome, lider, participantes);
         if (id == id_alvo) {
-            printf("Equipe '%s' (ID: %d) será removida.\n", nome, id);
             encontrado = 1;
+            printf("Equipe '%s' (ID: %d) será removida.\n", nome, id);
             continue;
         }
         fprintf(temp, "%d,%s,%s,%s\n", id, nome, lider, participantes);
@@ -176,7 +198,7 @@ void deletar_equipe() {
 // 5. Alterar pontuação de equipe
 // ============================================================================
 void alterar_pontuacao_equipe() {
-    listar_equipes();  // Mostra equipes com a nova formatação
+    listar_equipes();
 
     printf("\nDigite o nome exato da equipe que deseja alterar a pontuação: ");
     char nome_equipe[100];
