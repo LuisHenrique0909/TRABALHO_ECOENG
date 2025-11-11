@@ -5,9 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ------------------------------------------------------------
 // Inicializa um desafio (só mostra as regras básicas)
-// ------------------------------------------------------------
 Result iniciar_desafio(TipoDesafio tipo) {
     printf("\n===== INICIANDO DESAFIO =====\n");
     if (tipo == SUMO)
@@ -18,9 +16,7 @@ Result iniciar_desafio(TipoDesafio tipo) {
     return ok();
 }
 
-// ------------------------------------------------------------
 // Registra um resultado de desafio
-// ------------------------------------------------------------
 Result registrar_resultado(Resultado_Desafio *res) {
     if (!res) return erro(ERRO_INVALIDO, "Resultado inválido");
 
@@ -57,9 +53,7 @@ Result registrar_resultado(Resultado_Desafio *res) {
     return ok();
 }
 
-// ------------------------------------------------------------
 // Mostra as equipes que participarão (chaveamento)
-// ------------------------------------------------------------
 void gerar_chaveamento(TipoDesafio tipo) {
     FILE *f = abrir_csv("equipes.csv");
     if (!f) {
@@ -85,9 +79,7 @@ void gerar_chaveamento(TipoDesafio tipo) {
     printf("Chaveamento gerado com sucesso!\n");
 }
 
-// ------------------------------------------------------------
 // Mostra as pontuações registradas para um tipo de desafio
-// ------------------------------------------------------------
 void calcular_pontuacoes(TipoDesafio tipo) {
     FILE *f = abrir_csv("resultados_robo.csv");
     if (!f) {

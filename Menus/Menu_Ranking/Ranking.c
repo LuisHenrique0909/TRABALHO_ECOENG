@@ -14,9 +14,7 @@ typedef struct {
     int pontos;
 } RegistroRanking;
 
-// ------------------------------------------------------------
 // Função de comparação para qsort (ordem decrescente de pontos)
-// ------------------------------------------------------------
 int comparar_ranking(const void *a, const void *b) {
     const RegistroRanking *ra = a;
     const RegistroRanking *rb = b;
@@ -25,9 +23,7 @@ int comparar_ranking(const void *a, const void *b) {
     return (ra->tempo > rb->tempo) - (ra->tempo < rb->tempo);
 }
 
-// ------------------------------------------------------------
 // Lê todos os resultados do CSV
-// ------------------------------------------------------------
 int carregar_resultados(RegistroRanking *lista, int max) {
     FILE *f = abrir_csv("resultados_robo.csv");
     if (!f) return 0;
@@ -155,9 +151,7 @@ void mostrar_ranking(TipoDesafio tipo) {
     }
 }
 
-// ------------------------------------------------------------
 // Mostra ranking geral combinando todos os desafios
-// ------------------------------------------------------------
 void mostrar_ranking_geral() {
     RegistroRanking lista[200];
     int total = carregar_resultados(lista, 200);
@@ -235,9 +229,7 @@ void mostrar_ranking_geral() {
     }
 }
 
-// ------------------------------------------------------------
 // Menu de ranking interativo (usado por admin, avaliador e equipe)
-// ------------------------------------------------------------
 void menu_ranking() {
     printf("\n===== MENU RANKING =====\n");
     printf("1 - Ver Ranking Robô Sumô\n");

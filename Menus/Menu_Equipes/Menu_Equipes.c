@@ -5,9 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ================================================================
 // Menu principal do participante
-// ================================================================
 void menu_equipe(User *usuario) {
     if (!usuario) {
         printf("Erro: usuário não logado.\n");
@@ -113,9 +111,7 @@ void menu_equipe(User *usuario) {
     return menu_equipe(usuario);
 }
 
-// ================================================================
 // Mostra a pontuação da equipe logada (dados do CSV de resultados)
-// ================================================================
 void mostrar_pontuacao_da_equipe(User *usuario) {
     FILE *f_eq = abrir_csv("equipes.csv");
     if (!f_eq) {

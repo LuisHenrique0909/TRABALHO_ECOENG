@@ -3,9 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-// ============================================================================
 // Cria a pasta ./dados caso não exista
-// ============================================================================
 void criar_diretorio_dados() {
 #ifdef _WIN32
     struct _stat st = {0};
@@ -20,9 +18,7 @@ void criar_diretorio_dados() {
 #endif
 }
 
-// ============================================================================
 // Verifica se um arquivo existe dentro de ./dados/
-// ============================================================================
 int arquivo_existe(const char *arquivo) {
     char caminho[256];
     snprintf(caminho, sizeof(caminho), "%s%s", DATA_DIR, arquivo);
@@ -32,9 +28,7 @@ int arquivo_existe(const char *arquivo) {
     return 1;
 }
 
-// ============================================================================
 // Abre um CSV existente em modo leitura
-// ============================================================================
 FILE* abrir_csv(const char *arquivo) {
     char caminho[256];
     snprintf(caminho, sizeof(caminho), "%s%s", DATA_DIR, arquivo);
@@ -42,10 +36,8 @@ FILE* abrir_csv(const char *arquivo) {
     return f;
 }
 
-// ============================================================================
 // Abre um CSV para escrita, adicionando cabeçalho se o arquivo não existir
 // Usa modo append ("a"), garantindo persistência e não sobrescrita
-// ============================================================================
 FILE* escrever_no_csv(const char *arquivo, const char *cabecalho) {
     char caminho[256];
     snprintf(caminho, sizeof(caminho), "%s%s", DATA_DIR, arquivo);
@@ -63,9 +55,7 @@ FILE* escrever_no_csv(const char *arquivo, const char *cabecalho) {
     return f;
 }
 
-// ============================================================================
 // Conta o número de linhas (útil para gerar IDs automáticos)
-// ============================================================================
 long contar_linhas(const char *arquivo) {
     FILE *f = abrir_csv(arquivo);
     if (!f) return 0;
@@ -82,9 +72,7 @@ long contar_linhas(const char *arquivo) {
     return count;
 }
 
-// ============================================================================
 // Limpa completamente um arquivo CSV e reescreve o cabeçalho
-// ============================================================================
 Result limpar_arquivo(const char *arquivo) {
     char caminho[256];
     snprintf(caminho, sizeof(caminho), "%s%s", DATA_DIR, arquivo);

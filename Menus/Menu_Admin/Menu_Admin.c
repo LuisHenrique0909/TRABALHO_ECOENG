@@ -8,9 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ============================================================================
 // Função principal do menu do administrador
-// ============================================================================
 void menu_admin() {
     printf("\n===== MENU ADMINISTRADOR =====\n");
     printf("1 - Listar todos os usuários\n");
@@ -62,9 +60,7 @@ void menu_admin() {
     return menu_admin();
 }
 
-// ============================================================================
 // 1. Listar todos os usuários
-// ============================================================================
 void listar_todos_usuarios() {
     FILE *f = abrir_csv("users.csv");
     if (!f) {
@@ -96,9 +92,7 @@ void listar_todos_usuarios() {
     fclose(f);
 }
 
-// ============================================================================
 // 2. Deletar usuário por ID
-// ============================================================================
 void deletar_usuario() {
     listar_todos_usuarios();
     printf("\nDigite o ID do usuário que deseja deletar: ");
@@ -142,9 +136,7 @@ void deletar_usuario() {
         printf("Usuário não encontrado.\n");
 }
 
-// ============================================================================
 // 4. Deletar equipe
-// ============================================================================
 void deletar_equipe() {
     listar_equipes();
     
@@ -189,9 +181,7 @@ void deletar_equipe() {
         printf("Equipe não encontrada.\n");
 }
 
-// ============================================================================
 // 5. Alterar pontuação de equipe
-// ============================================================================
 void alterar_pontuacao_equipe() {
     listar_equipes();
 

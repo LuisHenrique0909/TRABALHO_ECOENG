@@ -2,9 +2,7 @@
 #include <stdlib.h>
 #include "result.h"
 
-// ==========================================================
 // Funções utilitárias para criar resultados
-// ==========================================================
 
 // Retorno de sucesso (sem mensagem)
 Result ok(void) {
@@ -26,11 +24,9 @@ void print_err(Result *r){
 }
 
 
-// ==========================================================
 // EXEMPLOS DE USO
-// ==========================================================
 
-// 1️⃣ Exemplo simples — validar argumento
+// Exemplo simples — validar argumento
 Result salvar_nome(const char *nome) {
     if (nome == NULL)
         return erro(ERRO_INVALIDO, "Nome não pode ser nulo");
@@ -39,7 +35,7 @@ Result salvar_nome(const char *nome) {
     return ok();
 }
 
-// 2️⃣ Exemplo com arquivo — abrir um CSV
+// Exemplo com arquivo — abrir um CSV
 Result abrir_arquivo(const char *caminho) {
     FILE *f = fopen(caminho, "r");
     if (!f)
@@ -50,7 +46,7 @@ Result abrir_arquivo(const char *caminho) {
     return ok();
 }
 
-// 3️⃣ Exemplo com alocação dinâmica
+// Exemplo com alocação dinâmica
 Result alocar_memoria(size_t tamanho) {
     void *ptr = malloc(tamanho);
     if (!ptr)
@@ -61,7 +57,7 @@ Result alocar_memoria(size_t tamanho) {
     return ok();
 }
 
-// 4️⃣ Exemplo encadeado — função que chama outras
+// Exemplo encadeado — função que chama outras
 Result carregar_dados(void) {
     Result r;
 

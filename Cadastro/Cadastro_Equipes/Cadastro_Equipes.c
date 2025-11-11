@@ -5,9 +5,7 @@
 #include <string.h>
 #include <ctype.h>
 
-// ============================================================================
 // FUNÇÕES INTERNAS (não exportadas no .h)
-// ============================================================================
 
 // Verifica se uma equipe já existe
 static int equipe_existe(const char *nome_equipe) {
@@ -182,9 +180,7 @@ static Result processar_arquivo_equipes(const char *nome_equipe, User *participa
     }
 }
 
-// ============================================================================
 // FUNÇÕES PRINCIPAIS (exportadas no .h)
-// ============================================================================
 
 // Cadastra uma nova equipe
 Result cadastrar_equipe(User *lider) {
