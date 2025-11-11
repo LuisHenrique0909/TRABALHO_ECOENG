@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
+#include <windows.h>
 
 #include "Menu_principal.h"
 #include "Files.h"
@@ -9,6 +10,7 @@
 int main() {
     // CONFIGURAÇÃO UTF-8
     setlocale(LC_ALL, "pt_BR.UTF-8");
+    SetConsoleOutputCP(CP_UTF8);
     
     printf("==============================================\n");
     printf("   SISTEMA DE GERENCIAMENTO DO EVENTO ECOENG  \n");

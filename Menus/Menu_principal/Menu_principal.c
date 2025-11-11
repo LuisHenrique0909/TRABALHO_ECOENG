@@ -34,12 +34,12 @@ void menu_principal() {
             User *usuario = login_user();
             if (!usuario) {
                 printf("\nUsuário não encontrado.\n");
-                printf("Deseja se cadastrar como PARTICIPANTE? (s/n): ");
-                char resp;
-                scanf(" %c", &resp);
+                printf("Deseja se cadastrar como PARTICIPANTE? (sim/não): ");
+                char resp[3];
+                scanf("%s", &resp[3]);
                 getchar();
 
-                if (resp == 's' || resp == 'S') {
+                if (resp[3] == 's' || resp[3] == 'S') {
                     singin(); // Cadastro automático
                     printf("\nCadastro realizado! Faça login novamente.\n");
                 } else {
