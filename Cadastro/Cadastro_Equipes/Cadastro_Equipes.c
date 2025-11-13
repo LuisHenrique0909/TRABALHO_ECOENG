@@ -1,5 +1,6 @@
 #include "Cadastro_Equipes.h"
 #include "Files.h"
+#include "Input_utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
