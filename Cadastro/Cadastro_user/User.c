@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <ctype.h> // isalpha(), isdigit(), isspace()
+#include <ctype.h>
 
 // ========================= VERIFICAÇÕES BÁSICAS =========================
 
