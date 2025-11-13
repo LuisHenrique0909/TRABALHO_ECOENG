@@ -1,6 +1,6 @@
 RA,NOME,CARGO,SENHA
-0,Admin,0,admin123
-1,Avaliador,2,avaliador123
+0,admin,0,admin123
+1,avaliador,2,avaliador123
 242424,higor gay pintos,1,123
 197041,luis henrique,1,123
 222424,enzo,1,123
@@ -10,4 +10,3 @@ RA,NOME,CARGO,SENHA
 330055,ana,1,123
 50505,jamys anão,1,123
 100100,gerson idoso,1,123
-50506,jamys gay,1,123

@@ -3,42 +3,38 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <ctype.h> // Necessário para isalpha(), isdigit() e isspace()
+#include <ctype.h> // isalpha(), isdigit(), isspace()
 
-// Verifica se o nome contém apenas letras e espaços
-// Retorna 1 se o nome for válido, 0 caso contenha números ou símbolos
+// ========================= VERIFICAÇÕES BÁSICAS =========================
+
+// Permite letras, espaços e acentuação comum em nomes
 int verificar_nome(const char *nome) {
+    const char *permitidos = "áéíóúàãõâêôçÁÉÍÓÚÀÃÕÂÊÔÇ´~ ";
     for (int i = 0; nome[i] != '\0'; i++) {
-        if (!isalpha(nome[i]) && nome[i] != ' ') {
-            return 0; // Nome inválido
+        unsigned char c = nome[i];
+        if (!isalpha(c) && !strchr(permitidos, c)) {
+            return 0;
         }
     }
-    return 1; // Nome válido
+    return 1;
 }
 
-// Verifica se o RA contém apenas números
-// Retorna 1 se todos os caracteres forem dígitos, 0 caso contrário
 int verificar_ra(const char *ra) {
     for (int i = 0; ra[i] != '\0'; i++) {
-        if (!isdigit(ra[i])) {
-            return 0; // RA inválido
-        }
+        if (!isdigit(ra[i])) return 0;
     }
-    return 1; // RA válido
+    return 1;
 }
 
-// Verifica se o nome é vazio (somente espaços ou Enter)
-// Retorna 1 se o campo estiver vazio, 0 caso contrário
 int nome_vazio(const char *nome) {
     for (int i = 0; nome[i] != '\0'; i++) {
-        if (!isspace(nome[i])) {
-            return 0; // Contém algum caractere válido
-        }
+        if (!isspace(nome[i])) return 0;
     }
-    return 1; // Nome vazio
+    return 1;
 }
 
-// Converte o enum Cargo para texto
+// ========================= UTILITÁRIOS =========================
+
 const char* cargo_pra_texto(Cargo cargo) {
     switch (cargo) {
         case ADMIN: return "Admin";
@@ -48,7 +44,8 @@ const char* cargo_pra_texto(Cargo cargo) {
     }
 }
 
-// Inicializa usuário admin padrão, se não existir
+// ========================= USUÁRIOS PADRÃO =========================
+
 void inicializar_admin() {
     FILE *f = abrir_csv("users.csv");
     int existe = 0;
@@ -72,7 +69,6 @@ void inicializar_admin() {
     }
 }
 
-// Inicializa usuário avaliador padrão, se não existir
 void inicializar_avaliador() {
     FILE *f = abrir_csv("users.csv");
     int existe = 0;
@@ -96,7 +92,8 @@ void inicializar_avaliador() {
     }
 }
 
-// Cadastro de novo participante
+// ========================= CADASTRO =========================
+
 void singin() {
     User u;
     inicializar_admin();
@@ -104,7 +101,6 @@ void singin() {
 
     printf("\n--- Cadastro de Participante ---\n");
 
-    // ======= Nome (aceita apenas letras e espaços, e não pode ser vazio) =======
     do {
         printf("Nome: ");
         fgets(u.nome, sizeof(u.nome), stdin);
@@ -113,11 +109,10 @@ void singin() {
         if (nome_vazio(u.nome)) {
             printf("Erro: o nome não pode estar vazio.\n");
         } else if (!verificar_nome(u.nome)) {
-            printf("Erro: o nome deve conter apenas letras e espaços.\n");
+            printf("Erro: o nome contém caracteres inválidos.\n");
         }
     } while (nome_vazio(u.nome) || !verificar_nome(u.nome));
 
-    // ======= RA (aceita apenas números) =======
     char ra_str[20];
     do {
         printf("RA: ");
@@ -130,14 +125,12 @@ void singin() {
     } while (!verificar_ra(ra_str));
     u.RA = atoi(ra_str);
 
-    // ======= Senha =======
     printf("Senha: ");
     fgets(u.senha, sizeof(u.senha), stdin);
     limpar_linha(u.senha);
 
     u.cargo = PARTICIPANTE;
 
-    // ======= Verifica duplicação de RA =======
     FILE *f = abrir_csv("users.csv");
     if (f) {
         char linha[256];
@@ -157,7 +150,6 @@ void singin() {
         fclose(f);
     }
 
-    // ======= Salva no CSV =======
     Result r = cadastrar_user(&u);
     if (r.code == OK)
         printf("Participante cadastrado com sucesso!\n");
@@ -165,7 +157,8 @@ void singin() {
         print_err(&r);
 }
 
-// Registra usuário no CSV
+// ========================= SALVAR NO CSV =========================
+
 Result cadastrar_user(User *u) {
     FILE *f = fopen("./dados/users.csv", "a");
     if (!f) {
@@ -184,7 +177,8 @@ Result cadastrar_user(User *u) {
     return ok();
 }
 
-// Login
+// ========================= LOGIN COM 3 TENTATIVAS =========================
+
 User* login_user() {
     FILE *f = abrir_csv("users.csv");
     if (!f) {
@@ -192,54 +186,75 @@ User* login_user() {
         return NULL;
     }
 
-    char nome[50], senha[50];
-    int RA_input;
-    printf("\n--- LOGIN ---\n");
-    printf("Nome: ");
-    fgets(nome, sizeof(nome), stdin);
-    limpar_linha(nome);
-    printf("RA: ");
-    scanf("%d", &RA_input);
-    getchar();
-    printf("Senha: ");
-    fgets(senha, sizeof(senha), stdin);
-    limpar_linha(senha);
+    int tentativas = 0;
+    while (tentativas < 3) {
+        char nome[50], senha[50];
+        int RA_input;
 
-    char linha[256];
-    fgets(linha, sizeof(linha), f);
+        printf("\n--- LOGIN ---\n");
+        printf("Nome: ");
+        fgets(nome, sizeof(nome), stdin);
+        limpar_linha(nome);
+        printf("RA: ");
+        scanf("%d", &RA_input);
+        getchar();
+        printf("Senha: ");
+        fgets(senha, sizeof(senha), stdin);
+        limpar_linha(senha);
 
-    User *u = NULL;
-    int logado = 0;
+        rewind(f);
+        char linha[256];
+        fgets(linha, sizeof(linha), f);
 
-    while (fgets(linha, sizeof(linha), f)) {
-        int RA_csv, cargo_csv;
-        char nome_csv[50], senha_csv[50];
+        User *u = NULL;
+        int logado = 0;
 
-        if (sscanf(linha, "%d,%49[^,],%d,%49[^\n]", &RA_csv, nome_csv, &cargo_csv, senha_csv) == 4) {
-            if (RA_csv == RA_input &&
-                strcmp(nome_csv, nome) == 0 &&
-                strcmp(senha_csv, senha) == 0) {
-                
-                u = malloc(sizeof(User));
-                if (u) {
-                    u->RA = RA_csv;
-                    strcpy(u->nome, nome_csv);
-                    u->cargo = (Cargo)cargo_csv;
-                    strcpy(u->senha, senha_csv);
-                    logado = 1;
+        while (fgets(linha, sizeof(linha), f)) {
+            int RA_csv, cargo_csv;
+            char nome_csv[50], senha_csv[50];
+
+            if (sscanf(linha, "%d,%49[^,],%d,%49[^\n]", &RA_csv, nome_csv, &cargo_csv, senha_csv) == 4) {
+                if (RA_csv == RA_input &&
+                    strcmp(nome_csv, nome) == 0 &&
+                    strcmp(senha_csv, senha) == 0) {
+                    
+                    u = malloc(sizeof(User));
+                    if (u) {
+                        u->RA = RA_csv;
+                        strcpy(u->nome, nome_csv);
+                        u->cargo = (Cargo)cargo_csv;
+                        strcpy(u->senha, senha_csv);
+                        logado = 1;
+                    }
+                    break;
                 }
-                break;
+            }
+        }
+
+        if (logado) {
+            fclose(f);
+            printf("Login realizado com sucesso!\n");
+            printf("Bem-vindo, %s! (%s)\n", u->nome, cargo_pra_texto(u->cargo));
+            return u;
+        }
+
+        tentativas++;
+        printf("Nome, RA ou senha incorretos. (%d/3)\n", tentativas);
+
+        if (tentativas == 3) {
+            char resp;
+            printf("Você errou 3 vezes. Deseja voltar ao menu principal? (s/n): ");
+            scanf(" %c", &resp);
+            getchar();
+            if (resp == 's' || resp == 'S') {
+                fclose(f);
+                return NULL;
+            } else {
+                tentativas = 0; // reinicia tentativas
             }
         }
     }
+
     fclose(f);
-
-    if (!logado) {
-        printf("Nome, RA ou senha incorretos.\n");
-        return NULL;
-    }
-
-    printf("Login realizado com sucesso!\n");
-    printf("Bem-vindo, %s! (%s)\n", u->nome, cargo_pra_texto(u->cargo));
-    return u;
+    return NULL;
 }

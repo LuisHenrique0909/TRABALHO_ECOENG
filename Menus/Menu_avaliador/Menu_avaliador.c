@@ -26,15 +26,20 @@ void menu_avaliador() {
         case 1: {
             printf("\n=== INICIANDO DESAFIO ROBÔ SUMÔ ===\n");
             iniciar_desafio(SUMO);
-            Resultado_Desafio res = {0};
-            res.tipo = SUMO;
-            registrar_resultado(&res);
-
-            printf("\nDeseja visualizar o ranking? (s/n): ");
-            char resp;
-            scanf(" %c", &resp);
+            gerar_chaveamento(SUMO);
+            printf("\nRegistrar resultado do desafio? (sim/não): ");
+            char resp[3];
+            scanf(" %s", &resp[0]);
             getchar();
-            if (resp == 's' || resp == 'S') {
+            if (resp[0] == 's' || resp[0] == 'S') {
+                Resultado_Desafio res = {0};
+                res.tipo = SUMO;
+                registrar_resultado(&res);
+            }
+            printf("\nDeseja visualizar o ranking? (sim/não): ");
+            scanf(" %s", &resp[0]);
+            getchar();
+            if (resp[0] == 's' || resp[0] == 'S') {
                 printf("\n1 - Ranking Sumô\n2 - Ranking Geral\nEscolha: ");
                 int opc_rank;
                 scanf("%d", &opc_rank);
@@ -48,15 +53,20 @@ void menu_avaliador() {
         case 2: {
             printf("\n=== INICIANDO DESAFIO ROBÔ SEGUIDOR DE LINHA ===\n");
             iniciar_desafio(SEGUIDOR_LINHA);
-            Resultado_Desafio res = {0};
-            res.tipo = SEGUIDOR_LINHA;
-            registrar_resultado(&res);
-
-            printf("\nDeseja visualizar o ranking? (s/n): ");
-            char resp;
-            scanf(" %c", &resp);
+            gerar_chaveamento(SEGUIDOR_LINHA);
+            printf("\nRegistrar resultado do desafio? (sim/não): ");
+            char resp[3];
+            scanf(" %s", &resp[0]);
             getchar();
-            if (resp == 's' || resp == 'S') {
+            if (resp[0] == 's' || resp[0] == 'S') {
+                Resultado_Desafio res = {0};
+                res.tipo = SEGUIDOR_LINHA;
+                registrar_resultado(&res);
+            }
+            printf("\nDeseja visualizar o ranking? (sim/não): ");
+            scanf(" %s", &resp[0]);
+            getchar();
+            if (resp[0] == 's' || resp[0] == 'S') {
                 printf("\n1 - Ranking Seguidor de Linha\n2 - Ranking Geral\nEscolha: ");
                 int opc_rank;
                 scanf("%d", &opc_rank);

@@ -18,6 +18,7 @@ void menu_principal() {
     printf("\n===== SISTEMA DE GERENCIAMENTO DO EVENTO ECOENG =====\n");
     printf("1 - Fazer login\n");
     printf("2 - Cadastrar novo usuário\n");
+    printf("3 - Local do evento\n");
     printf("0 - Sair\n");
     printf("Escolha: ");
 
@@ -36,10 +37,10 @@ void menu_principal() {
                 printf("\nUsuário não encontrado.\n");
                 printf("Deseja se cadastrar como PARTICIPANTE? (sim/não): ");
                 char resp[3];
-                scanf("%s", &resp[3]);
+                scanf("%s", &resp[0]);
                 getchar();
 
-                if (resp[3] == 's' || resp[3] == 'S') {
+                if (resp[0] == 's' || resp[0] == 'S') {
                     singin(); // Cadastro automático
                     printf("\nCadastro realizado! Faça login novamente.\n");
                 } else {
@@ -72,6 +73,13 @@ void menu_principal() {
         case 2:
             singin();
             printf("\nCadastro realizado com sucesso!\n");
+            break;
+
+        case 3:
+         printf("\n=== DATA E LOCAL DO EVENTO ===\n");
+            printf("O evento ECOENG será realizado no bloco E\n");
+            printf("Data: 18 e 19 de Novembro");
+            printf("\n=======================================\n");
             break;
             
         default:
