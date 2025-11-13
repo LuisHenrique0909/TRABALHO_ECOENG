@@ -5,52 +5,6 @@ Projeto desenvolvido para o trabalho da disciplina de EEstrutura de Dados, com f
 📂 Estrutura do Projeto
 Abaixo está a organização principal do projeto conforme a estrutura de pastas:
 
-TRABALHO_ECOENG/
-│
-├── bin/                        # Pasta para os arquivos compilados
-│
-├── Cadastro/
-│   ├── Cadastro_Equipes/       # Módulo de cadastro de equipes
-│   └── Cadastro_user/          # Módulo de cadastro de usuários
-│
-├── dados/                      # Base de dados em CSV
-│   ├── equipes.csv
-│   ├── resultados_robo.csv
-│   └── users.csv
-│
-├── Desafio_robo/               # Lógica e dados relacionados ao desafio de robôs
-│
-├── Funcoes_admin/              # Funções administrativas e de controle
-│
-├── Menus/                      # Menus principais do sistema
-│   ├── Menu_avaliador/
-│   │   ├── Menu_avaliador.c
-│   │   └── Menu_avaliador.h
-│   │
-│   ├── Menu_Equipes/
-│   │   ├── Menu_Equipes.c
-│   │   └── Menu_Equipes.h
-│   │
-│   ├── Menu_Ranking/
-│   │   ├── Ranking.c
-│   │   └── Ranking.h
-│   │
-│   ├── Menu_principal/         # Menu inicial e navegação geral
-│   
-│
-├── Utilidades/                 # Funções auxiliares reutilizáveis
-│   ├── files/
-│   │   ├── files.c
-│   │   └── files.h
-│   │
-│   └── Result/
-│       ├── Result.c
-│       └── Result.h
-│
-├── .gitignore                  # Arquivos ignorados pelo Git
-├── main.c                      # Ponto de entrada do programa
-├── makefile                    # Script de compilação
-└── README.md                   # Documentação do projeto
 
 🧩 Descrição dos Módulos
 🟢 Cadastro
