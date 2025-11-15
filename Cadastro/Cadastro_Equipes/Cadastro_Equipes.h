@@ -16,7 +16,7 @@ typedef struct {
 Result cadastrar_equipe(User *lider);
 Result adicionar_participante_equipe(const char *nome_equipe, User *participante);
 Result remover_participante_equipe(const char *nome_equipe, User *participante);
-void listar_equipes();
+int listar_equipes();
 void exibir_equipe_do_participante(User *usuario);
 
 #endif

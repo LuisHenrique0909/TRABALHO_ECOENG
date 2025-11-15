@@ -255,14 +255,11 @@ Result remover_participante_equipe(const char *nome_equipe, User *participante) 
 }
 
 // Lista todas as equipes
-void listar_equipes() {
+int listar_equipes() {
     FILE *f = abrir_csv("equipes.csv");
     if (!f) {
         printf("Nenhuma equipe cadastrada.\n");
-        // PAUSA
-        printf("\nPressione ENTER para voltar...");
-        getchar();
-        return;
+        return 0;
     }
 
     char linha[512];
@@ -299,6 +296,7 @@ void listar_equipes() {
     // PAUSA
     printf("\nPressione ENTER para voltar...");
     getchar();
+    return 1;
 }
 
 // Exibe a equipe e integrantes do usuário logado

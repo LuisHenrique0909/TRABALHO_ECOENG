@@ -13,7 +13,7 @@ int main() {
     SetConsoleOutputCP(CP_UTF8);
     
     printf("==============================================\n");
-    printf("   SISTEMA DE GERENCIAMENTO DO EVENTO ECOENG  \n");
+    printf("   SISTEMA DE GERENCIAMENTO DO EVENTO ENCOENG  \n");
     printf("==============================================\n\n");
 
     criar_diretorio_dados();

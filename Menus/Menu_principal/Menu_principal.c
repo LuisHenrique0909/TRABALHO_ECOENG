@@ -15,7 +15,7 @@ void menu_principal() {
     inicializar_admin();
     inicializar_avaliador();
 
-    printf("\n===== SISTEMA DE GERENCIAMENTO DO EVENTO ECOENG =====\n");
+    printf("\n===== SISTEMA DE GERENCIAMENTO DO EVENTO ENCOENG =====\n");
     printf("1 - Fazer login\n");
     printf("2 - Cadastrar novo usuário\n");
     printf("3 - Local do evento\n");

@@ -21,12 +21,12 @@ void menu_admin() {
     printf("Escolha: ");
     
     int opc;
-    scanf("%d", &opc);
+    scanf("%d\n", &opc);
     getchar();
 
     switch (opc) {
         case 1: 
-            listar_todos_usuarios(); 
+            listar_usuarios(); 
             pausar_sistema();
             break;
         case 2: 
@@ -61,11 +61,11 @@ void menu_admin() {
 }
 
 // 1. Listar todos os usuários
-void listar_todos_usuarios() {
+int listar_usuarios() {
     FILE *f = abrir_csv("users.csv");
     if (!f) {
         printf("Nenhum usuário encontrado.\n");
-        return;
+        return 0;
     }
 
     char linha[256];
@@ -90,11 +90,16 @@ void listar_todos_usuarios() {
     printf("────────────────────────────────────────\n");
     printf("Total de usuários: %d\n", count);
     fclose(f);
+    return 1;
 }
 
 // 2. Deletar usuário por ID
 void deletar_usuario() {
-    listar_todos_usuarios();
+
+    if(!listar_usuarios()) {
+        return;
+    }
+
     printf("\nDigite o ID do usuário que deseja deletar: ");
     int id_alvo;
     scanf("%d", &id_alvo);
@@ -138,7 +143,9 @@ void deletar_usuario() {
 
 // 4. Deletar equipe
 void deletar_equipe() {
-    listar_equipes();
+    if(!listar_equipes()) {
+        return;
+    }
     
     printf("\nDigite o ID da equipe que deseja deletar: ");
     int id_alvo;
@@ -183,7 +190,10 @@ void deletar_equipe() {
 
 // 5. Alterar pontuação de equipe
 void alterar_pontuacao_equipe() {
-    listar_equipes();
+
+    if (!listar_equipes()) {
+        return;
+    }
 
     printf("\nDigite o nome exato da equipe que deseja alterar a pontuação: ");
     char nome_equipe[100];
@@ -193,6 +203,7 @@ void alterar_pontuacao_equipe() {
     Pontuacao p;
     if (!buscar_pontuacao_por_equipe(nome_equipe, &p)) {
         printf("Equipe '%s' não encontrada no sistema.\n", nome_equipe);
+        pausar_sistema();
         return;
     }
 
@@ -207,4 +218,6 @@ void alterar_pontuacao_equipe() {
         printf("Pontuação da equipe '%s' atualizada com sucesso!\n", nome_equipe);
     else
         print_err(&r);
+    
+    pausar_sistema();
 }
