@@ -10,7 +10,7 @@
 Result iniciar_desafio(TipoDesafio tipo) {
     printf("\n===== INICIANDO DESAFIO =====\n");
     if (tipo == SUMO) {
-        printf("\nRobô SUMÔ: confronto direto. Vitória = 100 pontos.\n");
+        printf("Robô SUMÔ: confronto direto. Vitória = 100 pontos.\n");
         printf("Formato: Eliminação direta - cada vitória avança para a próxima rodada\n");
     } else {
         printf("Robô SEGUIDOR DE LINHA: menor tempo = maior pontuação.\n");
@@ -64,7 +64,6 @@ void gerar_chaveamento(TipoDesafio tipo) {
         printf("Chaveamento gerado e salvo com sucesso!\n");
         exibir_chaveamento(tipo);
     } else {
-        print_err(&r);
         return;
     }
 }

@@ -30,7 +30,7 @@ void menu_avaliador() {
             gerar_chaveamento(SUMO);
             FILE *f= fopen("equipes.csv", "r");
             if(!f){
-                printf("Nenhum registro de equipes encontrado. Retornando ao menu\n");
+                printf("\nNenhum registro de equipes encontrado. Retornando ao menu\n");
                 pausar_sistema();
                 break;
             }
@@ -65,7 +65,7 @@ void menu_avaliador() {
             gerar_chaveamento(SEGUIDOR_LINHA);
             FILE *f= fopen("equipes.csv", "r");
             if(!f){
-                printf("Nenhum registro de equipes encontrado. Retornando ao menu\n");
+                printf("\nNenhum registro de equipes encontrado. Retornando ao menu\n");
                 pausar_sistema();
                 break;
             }
