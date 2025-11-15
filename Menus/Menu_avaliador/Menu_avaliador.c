@@ -26,7 +26,15 @@ void menu_avaliador() {
         case 1: {
             printf("\n=== INICIANDO DESAFIO ROBÔ SUMÔ ===\n");
             iniciar_desafio(SUMO);
+
             gerar_chaveamento(SUMO);
+            FILE *f= fopen("equipes.csv", "r");
+            if(!f){
+                printf("Nenhum registro de equipes encontrado. Retornando ao menu\n");
+                pausar_sistema();
+                break;
+            }
+
             printf("\nRegistrar resultado do desafio? (sim/não): ");
             char resp[3];
             scanf(" %s", &resp[0]);
@@ -53,7 +61,15 @@ void menu_avaliador() {
         case 2: {
             printf("\n=== INICIANDO DESAFIO ROBÔ SEGUIDOR DE LINHA ===\n");
             iniciar_desafio(SEGUIDOR_LINHA);
+
             gerar_chaveamento(SEGUIDOR_LINHA);
+            FILE *f= fopen("equipes.csv", "r");
+            if(!f){
+                printf("Nenhum registro de equipes encontrado. Retornando ao menu\n");
+                pausar_sistema();
+                break;
+            }
+            
             printf("\nRegistrar resultado do desafio? (sim/não): ");
             char resp[3];
             scanf(" %s", &resp[0]);

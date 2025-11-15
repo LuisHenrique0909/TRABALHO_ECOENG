@@ -1,7 +1,7 @@
 #include "Desafio_robo.h"
 #include "Pontuacao.h"
 #include "Files.h"
-#include "Chaveamento.h"  // Agora deve funcionar
+#include "Chaveamento.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,7 +10,7 @@
 Result iniciar_desafio(TipoDesafio tipo) {
     printf("\n===== INICIANDO DESAFIO =====\n");
     if (tipo == SUMO) {
-        printf("Robô SUMÔ: confronto direto. Vitória = 100 pontos.\n");
+        printf("\nRobô SUMÔ: confronto direto. Vitória = 100 pontos.\n");
         printf("Formato: Eliminação direta - cada vitória avança para a próxima rodada\n");
     } else {
         printf("Robô SEGUIDOR DE LINHA: menor tempo = maior pontuação.\n");
@@ -65,6 +65,7 @@ void gerar_chaveamento(TipoDesafio tipo) {
         exibir_chaveamento(tipo);
     } else {
         print_err(&r);
+        return;
     }
 }
 
