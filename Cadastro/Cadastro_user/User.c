@@ -1,6 +1,5 @@
 #include "User.h"
 #include "Files.h"
-#include "Input_utils.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -106,7 +105,7 @@ void singin() {
         printf("Nome: ");
         fgets(u.nome, sizeof(u.nome), stdin);
         limpar_linha(u.nome);
-
+        
         if (nome_vazio(u.nome)) {
             printf("Erro: o nome não pode estar vazio.\n");
         } else if (!verificar_nome(u.nome)) {

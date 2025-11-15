@@ -72,7 +72,6 @@ void menu_principal() {
         
         case 2:
             singin();
-            printf("\nCadastro realizado com sucesso!\n");
             break;
 
         case 3:

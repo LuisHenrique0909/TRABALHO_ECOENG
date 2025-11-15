@@ -16,16 +16,14 @@ typedef struct {
     int pontuacao;
 } Resultado_Desafio;
 
-// Inicializa um desafio (Sumô ou Seguidor)
+// Funções principais
 Result iniciar_desafio(TipoDesafio tipo);
-
-// Registra resultados e atualiza pontuação da equipe
 Result registrar_resultado(Resultado_Desafio *res);
-
-// Gera chaveamento com base nas equipes cadastradas
 void gerar_chaveamento(TipoDesafio tipo);
-
-// Exibe a pontuação das equipes em determinado desafio
 void calcular_pontuacoes(TipoDesafio tipo);
+
+// Funções para gerenciamento de desafios
+Result registrar_vencedor_desafio(TipoDesafio tipo);
+void exibir_chaveamento_desafio(TipoDesafio tipo);
 
 #endif

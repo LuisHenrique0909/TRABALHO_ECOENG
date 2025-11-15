@@ -47,9 +47,8 @@ int carregar_resultados(RegistroRanking *lista, int max) {
     return count;
 }
 
-/* ------------------------------------------------------------
- Mostra o ranking filtrando por tipo de desafio
- ------------------------------------------------------------*/
+
+ //Mostra o ranking filtrando por tipo de desafio
  //não soma os resultados da equipe, apenas carrega os resultados salvos em resultados_robos
  //implementar equiperanking
 
@@ -146,8 +145,6 @@ void mostrar_ranking(TipoDesafio tipo) {
     
     if (num_equipes > 0) {
         printf("Maior pontuação total: %d pontos\n", equipes[0].total_pontos);
-        printf("Equipe com mais participações: %s (%d desafios)\n", 
-               equipes[0].nome_equipe, equipes[0].participacoes);
     }
 }
 
@@ -224,8 +221,6 @@ void mostrar_ranking_geral() {
     
     if (num_equipes > 0) {
         printf("Maior pontuação total: %d pontos\n", equipes[0].total_pontos);
-        printf("Equipe com mais participações: %s (%d desafios)\n", 
-               equipes[0].nome_equipe, equipes[0].participacoes);
     }
 }
 
@@ -257,6 +252,7 @@ void menu_ranking() {
             break;
         case 0:
             printf("Voltando ao menu anterior...\n");
+            pausar_sistema();
             return;
         default:
             printf("Opção inválida.\n");

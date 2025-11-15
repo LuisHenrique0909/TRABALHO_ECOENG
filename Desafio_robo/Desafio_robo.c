@@ -1,6 +1,7 @@
 #include "Desafio_robo.h"
 #include "Pontuacao.h"
 #include "Files.h"
+#include "Chaveamento.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,15 +9,18 @@
 // Inicializa um desafio (só mostra as regras básicas)
 Result iniciar_desafio(TipoDesafio tipo) {
     printf("\n===== INICIANDO DESAFIO =====\n");
-    if (tipo == SUMO)
+    if (tipo == SUMO) {
         printf("Robô SUMÔ: confronto direto. Vitória = 100 pontos.\n");
-    else
+        printf("Formato: Eliminação direta - cada vitória avança para a próxima rodada\n");
+    } else {
         printf("Robô SEGUIDOR DE LINHA: menor tempo = maior pontuação.\n");
+        printf("Pontuação: 1000 / tempo (em segundos)\n");
+    }
 
     return ok();
 }
 
-// Registra um resultado de desafio
+// Registra um resultado de desafio individual
 Result registrar_resultado(Resultado_Desafio *res) {
     if (!res) return erro(ERRO_INVALIDO, "Resultado inválido");
 
@@ -53,30 +57,15 @@ Result registrar_resultado(Resultado_Desafio *res) {
     return ok();
 }
 
-// Mostra as equipes que participarão (chaveamento)
+// Gera chaveamento usando o sistema persistente
 void gerar_chaveamento(TipoDesafio tipo) {
-    FILE *f = abrir_csv("equipes.csv");
-    if (!f) {
-        printf("Nenhuma equipe cadastrada.\n");
-        return;
+    Result r = gerar_chaveamento_persistente(tipo);
+    if (r.code == OK) {
+        printf("Chaveamento gerado e salvo com sucesso!\n");
+        exibir_chaveamento(tipo);
+    } else {
+        print_err(&r);
     }
-
-    char linha[512];
-    fgets(linha, sizeof(linha), f);
-
-    int id;
-    char nome[100], criador[50], membros[200];
-
-    printf("\n--- CHAVEAMENTO: %s ---\n", tipo == SUMO ? "SUMO" : "SEGUIDOR DE LINHA");
-
-    while (fgets(linha, sizeof(linha), f)) {
-        sscanf(linha, "%d,%99[^,],%49[^,],%199[^\n]", &id, nome, criador, membros);
-        printf("ID: %-3d | Equipe: %-20s | Líder: %-15s | Integrantes: %s\n",
-               id, nome, criador, membros);
-    }
-
-    fclose(f);
-    printf("Chaveamento gerado com sucesso!\n");
 }
 
 // Mostra as pontuações registradas para um tipo de desafio
@@ -107,4 +96,129 @@ void calcular_pontuacoes(TipoDesafio tipo) {
 
     fclose(f);
     printf("Cálculo de pontuações concluído!\n");
+}
+
+// Registra vencedor de um confronto específico
+Result registrar_vencedor_desafio(TipoDesafio tipo) {
+    Chaveamento *chave = carregar_chaveamento_ativo(tipo);
+    if (!chave) {
+        return erro(ERRO_LOGICA, "Nenhum chaveamento ativo encontrado. Gere um chaveamento primeiro.");
+    }
+
+    printf("\n=== REGISTRAR VENCEDOR - %s ===\n", 
+           tipo == SUMO ? "ROBÔ SUMÔ" : "ROBÔ SEGUIDOR DE LINHA");
+    
+    // Mostrar confrontos pendentes da rodada atual
+    printf("Confrontos da Rodada %d (Pendentes):\n", chave->rodada_atual);
+    int confrontos_pendentes = 0;
+    
+    for (int i = 0; i < chave->num_confrontos; i++) {
+        Confronto *c = &chave->confrontos[i];
+        if (c->rodada == chave->rodada_atual && c->status != FINALIZADO && c->id_equipe2 != -1) {
+            printf("[%d] %s vs %s\n", c->id_confronto, c->nome_equipe1, c->nome_equipe2);
+            confrontos_pendentes++;
+        }
+    }
+
+    if (confrontos_pendentes == 0) {
+        free(chave);
+        return erro(ERRO_LOGICA, "Nenhum confronto pendente nesta rodada.");
+    }
+
+    printf("\nID do confronto: ");
+    int id_confronto;
+    scanf("%d", &id_confronto);
+    getchar();
+
+    // Encontrar confronto
+    Confronto *confronto = NULL;
+    for (int i = 0; i < chave->num_confrontos; i++) {
+        if (chave->confrontos[i].id_confronto == id_confronto) {
+            confronto = &chave->confrontos[i];
+            break;
+        }
+    }
+
+    if (!confronto || confronto->status == FINALIZADO || confronto->rodada != chave->rodada_atual) {
+        free(chave);
+        return erro(ERRO_INVALIDO, "Confronto inválido, já finalizado ou não pertence à rodada atual.");
+    }
+
+    printf("Vencedor do confronto %d:\n", id_confronto);
+    printf("1 - %s\n", confronto->nome_equipe1);
+    printf("2 - %s\n", confronto->nome_equipe2);
+    printf("Escolha: ");
+    
+    int opc_vencedor;
+    scanf("%d", &opc_vencedor);
+    getchar();
+
+    int id_vencedor;
+    float tempo = 0.0;
+
+    if (opc_vencedor == 1) {
+        id_vencedor = confronto->id_equipe1;
+    } else if (opc_vencedor == 2) {
+        id_vencedor = confronto->id_equipe2;
+    } else {
+        free(chave);
+        return erro(ERRO_INVALIDO, "Opção inválida.");
+    }
+
+    // Para seguidor de linha, capturar tempo
+    if (tipo == SEGUIDOR_LINHA) {
+        printf("Tempo do vencedor (segundos): ");
+        scanf("%f", &tempo);
+        getchar();
+        
+        if (tempo <= 0) {
+            free(chave);
+            return erro(ERRO_INVALIDO, "Tempo deve ser maior que zero.");
+        }
+    }
+
+    // Registrar vencedor no arquivo
+    Result r = registrar_vencedor_confronto(id_confronto, id_vencedor, tempo);
+    
+    if (r.code == OK) {
+        printf("Vencedor registrado com sucesso!\n");
+        
+        // Verificar se é a final (todos os confrontos da rodada finalizados)
+        int todos_finalizados = 1;
+        for (int i = 0; i < chave->num_confrontos; i++) {
+            if (chave->confrontos[i].rodada == chave->rodada_atual && 
+                chave->confrontos[i].status != FINALIZADO) {
+                todos_finalizados = 0;
+                break;
+            }
+        }
+
+        if (todos_finalizados) {
+            printf("\n=== FIM DO DESAFIO ===\n");
+            printf("Campeão: %s\n", 
+                   id_vencedor == confronto->id_equipe1 ? 
+                   confronto->nome_equipe1 : confronto->nome_equipe2);
+            
+            // Registrar pontuação final para o campeão
+            Resultado_Desafio res_final;
+            res_final.id_equipe = id_vencedor;
+            strcpy(res_final.nome_equipe, 
+                   id_vencedor == confronto->id_equipe1 ? 
+                   confronto->nome_equipe1 : confronto->nome_equipe2);
+            res_final.tipo = tipo;
+            res_final.tempo_execucao = tempo;
+            res_final.pontuacao = (tipo == SUMO) ? 100 : (int)(1000 / tempo);
+            
+            registrar_resultado(&res_final);
+            printf("Pontuação final registrada: %d pontos\n", res_final.pontuacao);
+        }
+    }
+
+    free(chave);
+    return r;
+}
+
+// Exibe chaveamento formatado
+void exibir_chaveamento_desafio(TipoDesafio tipo) {
+    exibir_chaveamento(tipo);
 }

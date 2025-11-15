@@ -1,6 +1,7 @@
 #include "Menu_Equipes.h"
 #include "Files.h"
 #include "pausar_sistema.h"
+#include "Chaveamento.h"  // NOVO INCLUDE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -125,16 +126,20 @@ void mostrar_pontuacao_da_equipe(User *usuario) {
 
     char nome_equipe[100] = "";
     int id_equipe = -1;
+    char tipo_equipe[50] = "";  // NOVO: para armazenar o tipo da equipe
 
     char identificador_usuario[60];
     snprintf(identificador_usuario, sizeof(identificador_usuario), "%s:%d", usuario->nome, usuario->RA);
 
     while (fgets(linha_eq, sizeof(linha_eq), f_eq)) {
         int id;
-        char nome_eq[100], criador[50], participantes[500];
-        if (sscanf(linha_eq, "%d,%99[^,],%49[^,],%499[^\n]", &id, nome_eq, criador, participantes) == 4) {
+        char nome_eq[100], tipo_eq[50], criador[50], participantes[500];
+        // ATUALIZADO: novo formato com tipo_equipe
+        if (sscanf(linha_eq, "%d,%99[^,],%49[^,],%49[^,],%499[^\n]", 
+                   &id, nome_eq, tipo_eq, criador, participantes) == 5) {
             if (strstr(participantes, identificador_usuario)) {
                 strcpy(nome_equipe, nome_eq);
+                strcpy(tipo_equipe, tipo_eq);
                 id_equipe = id;
                 break;
             }
@@ -165,7 +170,9 @@ void mostrar_pontuacao_da_equipe(User *usuario) {
     int encontrou = 0;
     int total_pontos = 0;
 
-    printf("\n=== PONTUAÇÃO DA SUA EQUIPE (%s) ===\n", nome_equipe);
+    printf("\n=== PONTUAÇÃO DA SUA EQUIPE ===\n");
+    printf("Equipe: %s\n", nome_equipe);
+    printf("Tipo: %s\n", tipo_equipe);
     printf("────────────────────────────────────────\n");
     
     while (fgets(linha, sizeof(linha), f_res)) {
