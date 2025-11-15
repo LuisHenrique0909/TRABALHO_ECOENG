@@ -47,8 +47,6 @@ void menu_principal() {
                     printf("Voltando ao menu principal...\n");
                 }
             } else {
-                printf("\nBem-vindo(a), %s! Cargo: %s\n", 
-                       usuario->nome, cargo_pra_texto(usuario->cargo));
                 
                 // Redirecionamento conforme cargo
                 switch (usuario->cargo) {

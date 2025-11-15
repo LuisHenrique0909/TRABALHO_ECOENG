@@ -1,6 +1,8 @@
 #ifndef CHAVEAMENTO_H
 #define CHAVEAMENTO_H
 
+#include "Result.h"
+
 #include "Desafio_robo.h"
 
 typedef enum {
@@ -23,18 +25,17 @@ typedef struct {
 
 typedef struct {
     int id_chaveamento;
-    TipoDesafio tipo_desafio;
-    Confronto confrontos[32]; // Suporte até 32 equipes
+    TipoDesafio tipo_desafio;  // Agora usa o TipoDesafio de Desafio_robo.h
+    Confronto confrontos[32];
     int num_confrontos;
     int rodada_atual;
     int finalizado;
 } Chaveamento;
 
-// Funções principais
+// Declarações das funções
 Result gerar_chaveamento_persistente(TipoDesafio tipo);
 Result registrar_vencedor_confronto(int id_confronto, int id_vencedor, float tempo);
 void exibir_chaveamento(TipoDesafio tipo);
 Chaveamento* carregar_chaveamento_ativo(TipoDesafio tipo);
-Result avancar_rodada(TipoDesafio tipo);  // Nova função para avançar rodada automaticamente
 
 #endif

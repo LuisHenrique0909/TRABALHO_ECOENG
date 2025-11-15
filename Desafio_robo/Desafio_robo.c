@@ -1,7 +1,7 @@
 #include "Desafio_robo.h"
 #include "Pontuacao.h"
 #include "Files.h"
-#include "Chaveamento.h"
+#include "Chaveamento.h"  // Agora deve funcionar
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

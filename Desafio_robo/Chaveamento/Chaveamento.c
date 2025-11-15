@@ -1,11 +1,12 @@
 #include "Chaveamento.h"
+#include "Result.h"
 #include "Files.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-// Gera chaveamento persistente e salva em arquivo
+// Implementação das funções de chaveamento...
 Result gerar_chaveamento_persistente(TipoDesafio tipo) {
     FILE *f_equipes = abrir_csv("equipes.csv");
     if (!f_equipes) {
@@ -127,4 +128,22 @@ Result gerar_chaveamento_persistente(TipoDesafio tipo) {
     printf("Número de equipes no chaveamento: %d\n", num_equipes);
     
     return ok();
+}
+
+Result registrar_vencedor_confronto(int id_confronto, int id_vencedor, float tempo) {
+    // Implementação para registrar vencedor...
+    printf("Registrando vencedor do confronto %d: equipe %d com tempo %.2f\n", 
+           id_confronto, id_vencedor, tempo);
+    return ok();
+}
+
+void exibir_chaveamento(TipoDesafio tipo) {
+    // Implementação para exibir chaveamento...
+    printf("Exibindo chaveamento para o tipo: %d\n", tipo);
+}
+
+Chaveamento* carregar_chaveamento_ativo(TipoDesafio tipo) {
+    // Implementação para carregar chaveamento...
+    printf("Carregando chaveamento ativo para tipo: %d\n", tipo);
+    return NULL;
 }

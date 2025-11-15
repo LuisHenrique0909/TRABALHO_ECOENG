@@ -233,7 +233,7 @@ User* login_user() {
 
         if (logado) {
             fclose(f);
-            printf("Login realizado com sucesso!\n");
+            printf("\nLogin realizado com sucesso!\n");
             printf("Bem-vindo, %s! (%s)\n", u->nome, cargo_pra_texto(u->cargo));
             return u;
         }
