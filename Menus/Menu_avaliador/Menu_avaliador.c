@@ -69,7 +69,7 @@ void menu_avaliador() {
                 pausar_sistema();
                 break;
             }
-            
+
             printf("\nRegistrar resultado do desafio? (sim/não): ");
             char resp[3];
             scanf(" %s", &resp[0]);
@@ -95,9 +95,11 @@ void menu_avaliador() {
         }
         case 3:
             listar_equipes();
+            pausar_sistema();
             break;
         case 4:
             menu_ranking();
+            pausar_sistema();
             break;
         case 0:
             printf("Saindo do menu do avaliador...\n");
