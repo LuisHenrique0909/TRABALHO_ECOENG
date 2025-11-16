@@ -142,7 +142,7 @@ void singin() {
             if (sscanf(linha, "%d,%49[^,],%d,%49[^\n]", &RA_csv, nome_temp, &cargo_temp, senha_temp) == 4) {
                 if (RA_csv == u.RA) {
                     fclose(f);
-                    printf("Já existe um usuário com esse RA.\n");
+                    printf("\nJá existe um usuário com esse RA.\n");
                     return;
                 }
             }
@@ -152,7 +152,7 @@ void singin() {
 
     Result r = cadastrar_user(&u);
     if (r.code == OK)
-        printf("Participante cadastrado com sucesso!\n");
+        printf("\nParticipante cadastrado com sucesso!\n");
     else
         print_err(&r);
 }

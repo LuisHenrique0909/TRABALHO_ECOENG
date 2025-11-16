@@ -1,7 +1,8 @@
 #include "Menu_Equipes.h"
 #include "Files.h"
 #include "pausar_sistema.h"
-#include "Chaveamento.h"  // NOVO INCLUDE
+#include "Chaveamento.h"
+#include "Cadastro_Equipes.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,6 +40,12 @@ void menu_equipe(User *usuario) {
         case 3: {
             char nome_equipe[100], nome_participante[100];
             int ra_participante;
+
+            if(!listar_equipes()){
+                printf("\nNenhuma equipe cadastrada. Retornando ao menu...\n");
+                pausar_sistema();
+                break;
+            }
             
             printf("Nome da equipe: ");
             fgets(nome_equipe, sizeof(nome_equipe), stdin);
@@ -68,6 +75,12 @@ void menu_equipe(User *usuario) {
         case 4: {
             char nome_equipe[100], nome_participante[100];
             int ra_participante;
+
+            if(!listar_equipes()){
+                printf("\nNenhuma equipe cadastrada. Retornando ao menu...\n");
+                pausar_sistema();
+                break;
+            }
             
             printf("Nome da equipe: ");
             fgets(nome_equipe, sizeof(nome_equipe), stdin);
