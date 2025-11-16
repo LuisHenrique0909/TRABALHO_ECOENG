@@ -12,6 +12,8 @@ typedef struct {
     char participantes[500]; // Formato: "Nome1:RA1;Nome2:RA2;..."
 } Equipe;
 
+int participante_em_alguma_equipe(User *participante);
+
 // Funções principais
 Result cadastrar_equipe(User *lider);
 Result adicionar_participante_equipe(const char *nome_equipe, User *participante);

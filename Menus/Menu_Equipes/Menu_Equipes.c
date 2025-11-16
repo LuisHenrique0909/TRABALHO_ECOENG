@@ -35,14 +35,13 @@ void menu_equipe(User *usuario) {
             break;
         case 2:
             exibir_equipe_do_participante(usuario);
-            pausar_sistema();
             break;
         case 3: {
             char nome_equipe[100], nome_participante[100];
             int ra_participante;
 
-            if(!listar_equipes()){
-                printf("\nNenhuma equipe cadastrada. Retornando ao menu...\n");
+            if(!participante_em_alguma_equipe(usuario)) {
+                printf("Você não faz parte de nenhuma equipe.\n");
                 pausar_sistema();
                 break;
             }
@@ -76,8 +75,8 @@ void menu_equipe(User *usuario) {
             char nome_equipe[100], nome_participante[100];
             int ra_participante;
 
-            if(!listar_equipes()){
-                printf("\nNenhuma equipe cadastrada. Retornando ao menu...\n");
+            if(!participante_em_alguma_equipe(usuario)) {
+                printf("Você não faz parte de nenhuma equipe.\n");
                 pausar_sistema();
                 break;
             }

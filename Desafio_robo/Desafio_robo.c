@@ -1,6 +1,7 @@
 #include "Desafio_robo.h"
 #include "Pontuacao.h"
 #include "Files.h"
+
 #include "Chaveamento.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,12 +60,20 @@ Result registrar_resultado(Resultado_Desafio *res) {
 
 // Gera chaveamento usando o sistema persistente
 void gerar_chaveamento(TipoDesafio tipo) {
+    // Verificar se existem equipes antes de tentar gerar chaveamento
+    if (!existem_equipes_para_desafio(tipo)) {
+        printf("Número insuficiente de equipes do tipo %s cadastradas.\n", 
+               tipo == SUMO ? "Sumô" : "Seguidor de Linha");
+        printf("É necessário pelo menos 2 equipes do mesmo tipo.\n");
+        return;
+    }
+    
     Result r = gerar_chaveamento_persistente(tipo);
     if (r.code == OK) {
         printf("Chaveamento gerado e salvo com sucesso!\n");
         exibir_chaveamento(tipo);
     } else {
-        return;
+        printf("Erro ao gerar chaveamento: %s\n", r.msg); // ← CORRIGIDO: r.msg
     }
 }
 

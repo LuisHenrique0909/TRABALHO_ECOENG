@@ -30,7 +30,7 @@ static int equipe_existe(const char *nome_equipe) {
 }
 
 // Verifica se participante já está em alguma equipe
-static int participante_em_alguma_equipe(User *participante) {
+int participante_em_alguma_equipe(User *participante) {
     if (!participante) return 0;
     
     FILE *f = abrir_csv("equipes.csv");
