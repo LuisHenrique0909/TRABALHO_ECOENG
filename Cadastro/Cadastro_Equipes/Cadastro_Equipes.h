@@ -4,10 +4,11 @@
 #include "Result.h"
 #include "User.h"
 
-// Estrutura de equipe
+// Estrutura de equipe ATUALIZADA
 typedef struct {
     int id_equipe;
     char nome_equipe[100];
+    char tipo_equipe[20];  // NOVO CAMPO
     char nome_lider[100];
     char participantes[500]; // Formato: "Nome1:RA1;Nome2:RA2;..."
 } Equipe;

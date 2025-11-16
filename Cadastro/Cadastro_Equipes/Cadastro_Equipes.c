@@ -1,5 +1,6 @@
 #include "Cadastro_Equipes.h"
 #include "Files.h"
+#include "pausar_sistema.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -98,7 +99,8 @@ static Result processar_arquivo_equipes(const char *nome_equipe, User *participa
         return erro(ERRO_ARQUIVO, "Erro ao criar arquivo temporário.");
     }
     
-    fprintf(temp, "ID_EQUIPE,NOME_EQUIPE,LIDER,PARTICIPANTES\n");
+    // ATUALIZADO: 5 campos agora
+    fprintf(temp, "ID_EQUIPE,NOME_EQUIPE,TIPO_EQUIPE,LIDER,PARTICIPANTES\n");
 
     int modificado = 0;
     char identificador_participante[60];
@@ -120,9 +122,10 @@ static Result processar_arquivo_equipes(const char *nome_equipe, User *participa
         char *pos_nome_equipe = strstr(linha, nome_equipe);
         if (pos_nome_equipe != NULL) {
             int id;
-            char nome[100], lider[100], membros[500];
+            char nome[100], tipo[20], lider[100], membros[500];
             
-            if (sscanf(linha, "%d,%99[^,],%99[^,],%499[^\n]", &id, nome, lider, membros) == 4) {
+            // ATUALIZADO: 5 campos agora
+            if (sscanf(linha, "%d,%99[^,],%19[^,],%99[^,],%499[^\n]", &id, nome, tipo, lider, membros) == 5) {
                 if (operacao == 1) {
                     // Adicionar participante
                     if (strlen(membros) > 0) {
@@ -157,7 +160,8 @@ static Result processar_arquivo_equipes(const char *nome_equipe, User *participa
                     }
                 }
                 
-                fprintf(temp, "%d,%s,%s,%s\n", id, nome, lider, membros);
+                // ATUALIZADO: 5 campos agora
+                fprintf(temp, "%d,%s,%s,%s,%s\n", id, nome, tipo, lider, membros);
             }
         } else {
             // Manter linha original sem processamento
@@ -223,15 +227,34 @@ Result cadastrar_equipe(User *lider) {
     if (equipe_existe(e.nome_equipe))
         return erro(ERRO_LOGICA, "Já existe uma equipe com esse nome.");
 
+    // NOVO: Selecionar tipo da equipe
+    printf("Tipo da equipe:\n");
+    printf("1 - Sumo\n");
+    printf("2 - Seguidor de Linha\n");
+    printf("Escolha: ");
+    int tipo_opc;
+    scanf("%d", &tipo_opc);
+    getchar();
+    
+    char tipo_equipe[20];
+    if (tipo_opc == 1) {
+        strcpy(tipo_equipe, "Sumo");
+    } else if (tipo_opc == 2) {
+        strcpy(tipo_equipe, "Seguidor");
+    } else {
+        return erro(ERRO_INVALIDO, "Tipo de equipe inválido.");
+    }
+
     criar_identificador_participante(e.participantes, sizeof(e.participantes), lider);
 
-    FILE *f = escrever_no_csv("equipes.csv", "ID_EQUIPE,NOME_EQUIPE,LIDER,PARTICIPANTES\n");
+    FILE *f = escrever_no_csv("equipes.csv", "ID_EQUIPE,NOME_EQUIPE,TIPO_EQUIPE,LIDER,PARTICIPANTES\n");
     if (!f) return erro(ERRO_ARQUIVO, "Erro ao abrir arquivo de equipes.");
 
-    fprintf(f, "%d,%s,%s,%s\n", e.id_equipe, e.nome_equipe, e.nome_lider, e.participantes);
+    // ATUALIZADO: Adicionar tipo_equipe
+    fprintf(f, "%d,%s,%s,%s,%s\n", e.id_equipe, e.nome_equipe, tipo_equipe, e.nome_lider, e.participantes);
     fclose(f);
 
-    printf("Equipe '%s' criada com sucesso! (ID: %d)\n", e.nome_equipe, e.id_equipe);
+    printf("Equipe '%s' criada com sucesso! (ID: %d, Tipo: %s)\n", e.nome_equipe, e.id_equipe, tipo_equipe);
     return ok();
 }
 
@@ -267,17 +290,19 @@ int listar_equipes() {
     printf("\n=== LISTA DE EQUIPES ===\n");
 
     int id;
-    char nome[100], lider[100], membros[500];
+    char nome[100], tipo[20], lider[100], membros[500];
     int count = 0;
 
     while (fgets(linha, sizeof(linha), f)) {
         linha[strcspn(linha, "\n")] = '\0';
         linha[strcspn(linha, "\r")] = '\0';
         
-        if (sscanf(linha, "%d,%99[^,],%99[^,],%499[^\n]", &id, nome, lider, membros) == 4) {
+        // ATUALIZADO: 5 campos agora
+        if (sscanf(linha, "%d,%99[^,],%19[^,],%99[^,],%499[^\n]", &id, nome, tipo, lider, membros) == 5) {
             printf("\n────────────────────────────────────────\n");
             printf("ID: %d\n", id);
             printf("Nome: %s\n", nome);
+            printf("Tipo: %s\n", tipo);
             printf("Líder: %s\n", lider);
             formatar_exibicao_participantes(membros);
             count++;
@@ -293,9 +318,7 @@ int listar_equipes() {
 
     fclose(f);
     
-    // PAUSA
-    printf("\nPressione ENTER para voltar...");
-    getchar();
+    pausar_sistema();
     return 1;
 }
 
@@ -317,21 +340,23 @@ void exibir_equipe_do_participante(User *usuario) {
 
     int encontrado = 0;
     int id;
-    char nome[100], lider[100], membros[500];
+    char nome[100], tipo[20], lider[100], membros[500];
 
     char identificador_usuario[60];
-    criar_identificador_participante(identificador_usuario, sizeof(identificador_usuario), usuario);
+    snprintf(identificador_usuario, sizeof(identificador_usuario), "%s:%d", usuario->nome, usuario->RA);
 
     while (fgets(linha, sizeof(linha), f)) {
         linha[strcspn(linha, "\n")] = '\0';
         linha[strcspn(linha, "\r")] = '\0';
         
-        if (sscanf(linha, "%d,%99[^,],%99[^,],%499[^\n]", &id, nome, lider, membros) == 4) {
+        // ATUALIZADO: 5 campos agora
+        if (sscanf(linha, "%d,%99[^,],%19[^,],%99[^,],%499[^\n]", &id, nome, tipo, lider, membros) == 5) {
             if (strstr(membros, identificador_usuario)) {
                 printf("\n=== SUA EQUIPE ===\n");
                 printf("────────────────────────────────────────\n");
                 printf("ID: %d\n", id);
                 printf("Nome: %s\n", nome);
+                printf("Tipo: %s\n", tipo);
                 printf("Líder: %s\n", lider);
                 formatar_exibicao_participantes(membros);
                 printf("────────────────────────────────────────\n");
@@ -347,7 +372,5 @@ void exibir_equipe_do_participante(User *usuario) {
         printf("\nVocê ainda não está em nenhuma equipe.\n");
     }
 
-    // CORREÇÃO: Pausa antes de voltar ao menu
-    printf("\nPressione ENTER para voltar ao menu...");
-    getchar();
+    pausar_sistema();
 }
