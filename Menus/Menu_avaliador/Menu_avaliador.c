@@ -164,7 +164,6 @@ void menu_avaliador() {
         
         case 3:
             listar_equipes();
-            pausar_sistema();
             break;
             
         case 4:

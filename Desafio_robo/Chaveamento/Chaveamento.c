@@ -8,7 +8,7 @@
 
 // Função auxiliar para verificar equipes
 int existem_equipes_para_desafio(TipoDesafio tipo) {
-    FILE *f_equipes = fopen("equipes.csv", "r");
+    FILE *f_equipes = fopen("./dados/equipes.csv", "r");
     if (!f_equipes) return 0;
     
     char linha[512];
@@ -23,7 +23,9 @@ int existem_equipes_para_desafio(TipoDesafio tipo) {
         
         if (sscanf(linha, "%d,%99[^,],%49[^,],%99[^,],%499[^\n]", 
                    &id, nome, tipo_equipe, lider, participantes) == 5) {
-            if (strcmp(tipo_equipe, tipo_busca) == 0) {
+            // CORREÇÃO: Comparação mais flexível para lidar com encoding
+            if ((tipo == SUMO && (strcmp(tipo_equipe, "Sumo") == 0 || strcmp(tipo_equipe, "Sumô") == 0)) ||
+                (tipo == SEGUIDOR_LINHA && strcmp(tipo_equipe, "Seguidor") == 0)) {
                 count++;
                 if (count >= 2) {
                     fclose(f_equipes);
@@ -62,8 +64,8 @@ Result gerar_chaveamento_persistente(TipoDesafio tipo) {
         if (sscanf(linha, "%d,%99[^,],%49[^,],%99[^,],%499[^\n]", 
                    &id, nome, tipo_equipe, lider, participantes) == 5) {
             
-            if ((tipo == SUMO && strcmp(tipo_equipe, "Sumo") == 0) ||
-                (tipo == SEGUIDOR_LINHA && strcmp(tipo_equipe, "Seguidor") == 0)) {
+        if ((tipo == SUMO && (strcmp(tipo_equipe, "Sumo") == 0 || strcmp(tipo_equipe, "Sumô") == 0)) ||
+            (tipo == SEGUIDOR_LINHA && strcmp(tipo_equipe, "Seguidor") == 0)) {
                 equipes[num_equipes] = id;
                 strcpy(nomes_equipes[num_equipes], nome);
                 num_equipes++;
@@ -101,7 +103,7 @@ Result gerar_chaveamento_persistente(TipoDesafio tipo) {
     }
 
     // Salvar chaveamento (CORRIGIDO - modo append)
-    FILE *f_chave_salvar = fopen("chaveamento.csv", "a");
+    FILE *f_chave_salvar = fopen("./dados/chaveamento.csv", "a");
     if (!f_chave_salvar) {
         return erro(ERRO_ARQUIVO, "Erro ao salvar chaveamento.");
     }
@@ -112,7 +114,7 @@ Result gerar_chaveamento_persistente(TipoDesafio tipo) {
     fclose(f_chave_salvar);
 
     // Salvar confrontos (CORRIGIDO - modo append)
-    FILE *f_confrontos = fopen("confrontos.csv", "a");
+    FILE *f_confrontos = fopen("./dados/confrontos.csv", "a");
     if (!f_confrontos) {
         return erro(ERRO_ARQUIVO, "Erro ao salvar confrontos.");
     }
@@ -148,7 +150,7 @@ Result gerar_chaveamento_persistente(TipoDesafio tipo) {
 // - exibir_chaveamento_desafio() (duplicata)
 
 void exibir_chaveamento(TipoDesafio tipo) {
-    FILE *f_chave = abrir_csv("chaveamento.csv");
+    FILE *f_chave = fopen("./dados/chaveamento.csv", "r");
     if (!f_chave) {
         printf("Nenhum chaveamento encontrado.\n");
         return;
@@ -230,7 +232,7 @@ void exibir_chaveamento(TipoDesafio tipo) {
 
 // Implementação completa de carregar_chaveamento_ativo
 Chaveamento* carregar_chaveamento_ativo(TipoDesafio tipo) {
-    FILE *f_chave = fopen("chaveamento.csv", "r");
+    FILE *f_chave = fopen("./dados/chaveamento.csv", "r");
     if (!f_chave) return NULL;
 
     // Primeiro, encontrar o ID do chaveamento ativo
@@ -291,7 +293,7 @@ Chaveamento* carregar_chaveamento_ativo(TipoDesafio tipo) {
 
 // Implementação completa de registrar_vencedor_confronto
 Result registrar_vencedor_confronto(int id_confronto, int id_vencedor, float tempo) {
-    FILE *f_confrontos = fopen("confrontos.csv", "r");
+    FILE *f_confrontos = fopen("./dados/confrontos.csv", "r");
     if (!f_confrontos) {
         return erro(ERRO_ARQUIVO, "Arquivo de confrontos não encontrado.");
     }
