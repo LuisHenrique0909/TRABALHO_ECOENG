@@ -23,9 +23,7 @@ int existem_equipes_para_desafio(TipoDesafio tipo) {
         
         if (sscanf(linha, "%d,%99[^,],%49[^,],%99[^,],%499[^\n]", 
                    &id, nome, tipo_equipe, lider, participantes) == 5) {
-            // CORREÇÃO: Comparação mais flexível para lidar com encoding
-            if ((tipo == SUMO && (strcmp(tipo_equipe, "Sumo") == 0 || strcmp(tipo_equipe, "Sumô") == 0)) ||
-                (tipo == SEGUIDOR_LINHA && strcmp(tipo_equipe, "Seguidor") == 0)) {
+            if (strcmp(tipo_equipe, tipo_busca) == 0) {
                 count++;
                 if (count >= 2) {
                     fclose(f_equipes);
@@ -45,7 +43,7 @@ Result gerar_chaveamento_persistente(TipoDesafio tipo) {
         return erro(ERRO_LOGICA, "Número insuficiente de equipes para gerar chaveamento (mínimo 2).");
     }
 
-    FILE *f_equipes = abrir_csv("equipes.csv");
+    FILE *f_equipes = fopen("./dados/equipes.csv", "r");
     if (!f_equipes) {
         return erro(ERRO_ARQUIVO, "Nenhuma equipe cadastrada.");
     }
@@ -64,8 +62,8 @@ Result gerar_chaveamento_persistente(TipoDesafio tipo) {
         if (sscanf(linha, "%d,%99[^,],%49[^,],%99[^,],%499[^\n]", 
                    &id, nome, tipo_equipe, lider, participantes) == 5) {
             
-        if ((tipo == SUMO && (strcmp(tipo_equipe, "Sumo") == 0 || strcmp(tipo_equipe, "Sumô") == 0)) ||
-            (tipo == SEGUIDOR_LINHA && strcmp(tipo_equipe, "Seguidor") == 0)) {
+            if ((tipo == SUMO && strcmp(tipo_equipe, "Sumo") == 0) ||
+                (tipo == SEGUIDOR_LINHA && strcmp(tipo_equipe, "Seguidor") == 0)) {
                 equipes[num_equipes] = id;
                 strcpy(nomes_equipes[num_equipes], nome);
                 num_equipes++;
@@ -73,6 +71,10 @@ Result gerar_chaveamento_persistente(TipoDesafio tipo) {
         }
     }
     fclose(f_equipes);
+
+    if (num_equipes < 2) {
+        return erro(ERRO_LOGICA, "Número insuficiente de equipes para gerar chaveamento (mínimo 2).");
+    }
 
     // Embaralhar equipes
     srand(time(NULL));
@@ -88,9 +90,9 @@ Result gerar_chaveamento_persistente(TipoDesafio tipo) {
         strcpy(nomes_equipes[j], temp_nome);
     }
 
-    // Gerar novo ID (CORRIGIDO - não sobrescrever arquivo)
+    // Gerar novo ID para chaveamento
     int novo_id = 1;
-    FILE *f_chave_existente = fopen("chaveamento.csv", "r");
+    FILE *f_chave_existente = fopen("./dados/chaveamento.csv", "r");
     if (f_chave_existente) {
         char linha[512];
         fgets(linha, sizeof(linha), f_chave_existente);
@@ -102,7 +104,7 @@ Result gerar_chaveamento_persistente(TipoDesafio tipo) {
         fclose(f_chave_existente);
     }
 
-    // Salvar chaveamento (CORRIGIDO - modo append)
+    // Salvar chaveamento
     FILE *f_chave_salvar = fopen("./dados/chaveamento.csv", "a");
     if (!f_chave_salvar) {
         return erro(ERRO_ARQUIVO, "Erro ao salvar chaveamento.");
@@ -113,7 +115,7 @@ Result gerar_chaveamento_persistente(TipoDesafio tipo) {
     fprintf(f_chave_salvar, "%d,%d,0\n", novo_id, tipo);
     fclose(f_chave_salvar);
 
-    // Salvar confrontos (CORRIGIDO - modo append)
+    // Salvar confrontos
     FILE *f_confrontos = fopen("./dados/confrontos.csv", "a");
     if (!f_confrontos) {
         return erro(ERRO_ARQUIVO, "Erro ao salvar confrontos.");
@@ -126,18 +128,33 @@ Result gerar_chaveamento_persistente(TipoDesafio tipo) {
     int id_confronto = 1;
     int rodada = 1;
     
+    // Encontrar o maior ID de confronto existente
+    FILE *f_conf_existente = fopen("./dados/confrontos.csv", "r");
+    if (f_conf_existente) {
+        char linha[512];
+        fgets(linha, sizeof(linha), f_conf_existente);
+        while (fgets(linha, sizeof(linha), f_conf_existente)) {
+            int id_conf;
+            sscanf(linha, "%d,", &id_conf);
+            if (id_conf >= id_confronto) id_confronto = id_conf + 1;
+        }
+        fclose(f_conf_existente);
+    }
+    
     // Primeira rodada
     for (int i = 0; i < num_equipes; i += 2) {
         if (i + 1 < num_equipes) {
+            // Confronto normal entre duas equipes
             fprintf(f_confrontos, "%d,%d,%d,%d,%s,%s,-1,0.0,%d,%d\n",
-                    id_confronto++, novo_id, equipes[i], equipes[i+1],
+                    id_confronto, novo_id, equipes[i], equipes[i+1],
                     nomes_equipes[i], nomes_equipes[i+1], rodada, AGUARDANDO);
         } else {
-            // Equipe recebe bye
+            // Equipe recebe bye (número ímpar de equipes)
             fprintf(f_confrontos, "%d,%d,%d,-1,%s,BYE,%d,0.0,%d,%d\n",
-                    id_confronto++, novo_id, equipes[i],
+                    id_confronto, novo_id, equipes[i],
                     nomes_equipes[i], equipes[i], rodada, FINALIZADO);
         }
+        id_confronto++;
     }
 
     fclose(f_confrontos);
@@ -145,10 +162,7 @@ Result gerar_chaveamento_persistente(TipoDesafio tipo) {
     return ok();
 }
 
-// REMOVI funções desnecessárias ou implementei
-// - calcular_pontuacoes() (não usada)
-// - exibir_chaveamento_desafio() (duplicata)
-
+// APENAS UMA DEFINIÇÃO da função exibir_chaveamento - REMOVA A SEGUNDA!
 void exibir_chaveamento(TipoDesafio tipo) {
     FILE *f_chave = fopen("./dados/chaveamento.csv", "r");
     if (!f_chave) {
@@ -158,7 +172,7 @@ void exibir_chaveamento(TipoDesafio tipo) {
     
     // Encontrar chaveamento ativo do tipo especificado
     char linha[512];
-    fgets(linha, sizeof(linha), f_chave); // Pular cabeçalho
+    fgets(linha, sizeof(linha), f_chave);
     
     int id_chaveamento = -1;
     while (fgets(linha, sizeof(linha), f_chave)) {
@@ -182,15 +196,17 @@ void exibir_chaveamento(TipoDesafio tipo) {
            tipo == SUMO ? "ROBÔ SUMÔ" : "ROBÔ SEGUIDOR DE LINHA");
     printf("ID do Chaveamento: %d\n\n", id_chaveamento);
     
-    FILE *f_confrontos = abrir_csv("confrontos.csv");
+    FILE *f_confrontos = fopen("./dados/confrontos.csv", "r");
     if (!f_confrontos) {
         printf("Erro ao carregar confrontos.\n");
         return;
     }
     
-    fgets(linha, sizeof(linha), f_confrontos); // Pular cabeçalho
+    fgets(linha, sizeof(linha), f_confrontos);
     
     int rodada_atual = 1;
+    int encontrou_confrontos = 0;
+    
     printf("--- RODADA %d ---\n", rodada_atual);
     
     while (fgets(linha, sizeof(linha), f_confrontos)) {
@@ -198,28 +214,37 @@ void exibir_chaveamento(TipoDesafio tipo) {
         float tempo;
         char nome_eq1[100], nome_eq2[100];
         
+        // CORREÇÃO: parsing mais robusto
         if (sscanf(linha, "%d,%d,%d,%d,%99[^,],%99[^,],%d,%f,%d,%d",
                    &id_confronto, &id_chave, &id_eq1, &id_eq2, 
-                   nome_eq1, nome_eq2, &id_vencedor, &tempo, &rodada, &status) == 10) {
+                   nome_eq1, nome_eq2, &id_vencedor, &tempo, &rodada, &status) >= 8) {
             
             if (id_chave == id_chaveamento) {
+                encontrou_confrontos = 1;
+                
                 if (rodada > rodada_atual) {
                     rodada_atual = rodada;
                     printf("\n--- RODADA %d ---\n", rodada_atual);
                 }
                 
-                printf("Confronto %d: %s vs %s", id_confronto, nome_eq1, nome_eq2);
+                printf("Confronto %d: ", id_confronto);
                 
-                if (status == FINALIZADO && id_vencedor != -1) {
-                    printf(" → Vencedor: %s", 
-                           id_vencedor == id_eq1 ? nome_eq1 : nome_eq2);
-                    if (tipo == SEGUIDOR_LINHA && tempo > 0) {
-                        printf(" (Tempo: %.2fs)", tempo);
-                    }
-                } else if (id_eq2 == -1) {
-                    printf(" → BYE (avança automaticamente)");
+                if (id_eq2 == -1) {
+                    // BYE
+                    printf("%s → BYE (avança automaticamente)", nome_eq1);
                 } else {
-                    printf(" → Aguardando resultado");
+                    // Confronto normal
+                    printf("%s vs %s", nome_eq1, nome_eq2);
+                    
+                    if (status == FINALIZADO && id_vencedor != -1) {
+                        printf(" → Vencedor: %s", 
+                               id_vencedor == id_eq1 ? nome_eq1 : nome_eq2);
+                        if (tipo == SEGUIDOR_LINHA && tempo > 0) {
+                            printf(" (Tempo: %.2fs)", tempo);
+                        }
+                    } else {
+                        printf(" → Aguardando resultado");
+                    }
                 }
                 printf("\n");
             }
@@ -227,6 +252,11 @@ void exibir_chaveamento(TipoDesafio tipo) {
     }
     
     fclose(f_confrontos);
+    
+    if (!encontrou_confrontos) {
+        printf("Nenhum confronto encontrado para este chaveamento.\n");
+    }
+    
     printf("\n");
 }
 
@@ -264,7 +294,7 @@ Chaveamento* carregar_chaveamento_ativo(TipoDesafio tipo) {
     chave->rodada_atual = 1;
 
     // Carregar confrontos
-    FILE *f_confrontos = fopen("confrontos.csv", "r");
+    FILE *f_confrontos = fopen("./dados/confrontos.csv", "r");
     if (f_confrontos) {
         fgets(linha, sizeof(linha), f_confrontos); // Cabeçalho
         
@@ -356,7 +386,7 @@ Result registrar_vencedor_confronto(int id_confronto, int id_vencedor, float tem
     }
 
     // Reescrever arquivo
-    FILE *f_out = fopen("confrontos.csv", "w");
+    FILE *f_out = fopen("./dados/confrontos.csv", "w");
     if (!f_out) {
         for (int i = 0; i < num_linhas; i++) free(linhas[i]);
         free(linhas);
