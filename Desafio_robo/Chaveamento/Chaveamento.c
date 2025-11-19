@@ -215,80 +215,89 @@ void exibir_chaveamento(TipoDesafio tipo) {
     
     fgets(linha, sizeof(linha), f_confrontos);
     
-    int rodada_atual = 1;
     int encontrou_confrontos = 0;
     
-    // Primeiro, coletar todos os confrontos para organizar por rodada
-    typedef struct {
-        int id_confronto;
-        int id_equipe1;
-        int id_equipe2;
-        int id_vencedor;
-        float tempo;
-        int rodada;
-        int status;
-        char nome_equipe1[100];
-        char nome_equipe2[100];
-    } ConfrontoInfo;
+    printf("--- RODADA 1 ---\n");
     
-    ConfrontoInfo confrontos[50];
-    int num_confrontos = 0;
-    
-    while (fgets(linha, sizeof(linha), f_confrontos) && num_confrontos < 50) {
-        // Limpar a linha de quebras
+    while (fgets(linha, sizeof(linha), f_confrontos)) {
+        // Limpar a linha
         linha[strcspn(linha, "\n")] = 0;
         linha[strcspn(linha, "\r")] = 0;
         
-        ConfrontoInfo *c = &confrontos[num_confrontos];
+        // Usar parsing manual para evitar problemas
+        char *token;
+        char *rest = linha;
         
-        // Parsing mais robusto
-        if (sscanf(linha, "%d,%d,%d,%d,%99[^,],%99[^,],%d,%f,%d,%d",
-                   &c->id_confronto, &c->id_equipe1, &c->id_equipe2, 
-                   c->nome_equipe1, c->nome_equipe2, &c->id_vencedor, 
-                   &c->tempo, &c->rodada, &c->status) >= 6) {
-            
-            // Verificar se pertence ao chaveamento correto
-            // O segundo campo é o ID do chaveamento
-            int id_chave_confronto;
-            char *token = strtok(linha, ",");
-            if (token) {
-                id_chave_confronto = atoi(token); // ID_CONFRONTO
-                token = strtok(NULL, ","); // ID_CHAVEAMENTO
-                if (token) {
-                    id_chave_confronto = atoi(token);
-                    if (id_chave_confronto == id_chaveamento) {
-                        num_confrontos++;
-                        encontrou_confrontos = 1;
-                    }
-                }
-            }
-        }
-    }
-    fclose(f_confrontos);
-    
-    if (!encontrou_confrontos) {
-        printf("Nenhum confronto encontrado para este chaveamento.\n");
-        return;
-    }
-    
-    // Agora exibir organizado por rodada
-    int rodada_exibida = 1;
-    printf("--- RODADA %d ---\n", rodada_exibida);
-    
-    for (int i = 0; i < num_confrontos; i++) {
-        ConfrontoInfo *c = &confrontos[i];
+        // ID_CONFRONTO
+        token = strtok_r(rest, ",", &rest);
+        if (!token) continue;
+        int id_confronto = atoi(token);
         
-        // Só mostrar confrontos da primeira rodada inicialmente
-        if (c->rodada == 1) {
-            printf("Confronto %d: %s vs %s", c->id_confronto, c->nome_equipe1, c->nome_equipe2);
+        // ID_CHAVEAMENTO
+        token = strtok_r(rest, ",", &rest);
+        if (!token) continue;
+        int id_chave = atoi(token);
+        
+        // Verificar se pertence ao chaveamento correto
+        if (id_chave != id_chaveamento) continue;
+        
+        encontrou_confrontos = 1;
+        
+        // ID_EQUIPE1
+        token = strtok_r(rest, ",", &rest);
+        if (!token) continue;
+        int id_equipe1 = atoi(token);
+        
+        // ID_EQUIPE2
+        token = strtok_r(rest, ",", &rest);
+        if (!token) continue;
+        int id_equipe2 = atoi(token);
+        
+        // NOME_EQUIPE1
+        token = strtok_r(rest, ",", &rest);
+        if (!token) continue;
+        char nome_equipe1[100];
+        strncpy(nome_equipe1, token, sizeof(nome_equipe1)-1);
+        nome_equipe1[sizeof(nome_equipe1)-1] = '\0';
+        
+        // NOME_EQUIPE2
+        token = strtok_r(rest, ",", &rest);
+        if (!token) continue;
+        char nome_equipe2[100];
+        strncpy(nome_equipe2, token, sizeof(nome_equipe2)-1);
+        nome_equipe2[sizeof(nome_equipe2)-1] = '\0';
+        
+        // ID_VENCEDOR
+        token = strtok_r(rest, ",", &rest);
+        if (!token) continue;
+        int id_vencedor = atoi(token);
+        
+        // TEMPO_VENCEDOR
+        token = strtok_r(rest, ",", &rest);
+        if (!token) continue;
+        float tempo_vencedor = atof(token);
+        
+        // RODADA
+        token = strtok_r(rest, ",", &rest);
+        if (!token) continue;
+        int rodada = atoi(token);
+        
+        // STATUS
+        token = strtok_r(rest, ",", &rest);
+        if (!token) continue;
+        int status = atoi(token);
+        
+        // Só mostrar confrontos da primeira rodada
+        if (rodada == 1) {
+            printf("Confronto %d: %s vs %s", id_confronto, nome_equipe1, nome_equipe2);
             
-            if (c->status == FINALIZADO && c->id_vencedor != -1) {
+            if (status == FINALIZADO && id_vencedor != -1) {
                 printf(" → Vencedor: %s", 
-                       c->id_vencedor == c->id_equipe1 ? c->nome_equipe1 : c->nome_equipe2);
-                if (tipo == SEGUIDOR_LINHA && c->tempo > 0) {
-                    printf(" (Tempo: %.2fs)", c->tempo);
+                       id_vencedor == id_equipe1 ? nome_equipe1 : nome_equipe2);
+                if (tipo == SEGUIDOR_LINHA && tempo_vencedor > 0) {
+                    printf(" (Tempo: %.2fs)", tempo_vencedor);
                 }
-            } else if (c->id_equipe2 == -1) {
+            } else if (id_equipe2 == -1) {
                 printf(" → BYE (avança automaticamente)");
             } else {
                 printf(" → Aguardando resultado");
@@ -297,9 +306,14 @@ void exibir_chaveamento(TipoDesafio tipo) {
         }
     }
     
+    fclose(f_confrontos);
+    
+    if (!encontrou_confrontos) {
+        printf("Nenhum confronto encontrado para este chaveamento.\n");
+    }
+    
     printf("\n");
 }
-
 // Implementação completa de carregar_chaveamento_ativo
 Chaveamento* carregar_chaveamento_ativo(TipoDesafio tipo) {
     FILE *f_chave = fopen("./dados/chaveamento.csv", "r");
@@ -331,7 +345,7 @@ Chaveamento* carregar_chaveamento_ativo(TipoDesafio tipo) {
     chave->tipo_desafio = tipo;
     chave->finalizado = 0;
     chave->num_confrontos = 0;
-    chave->rodada_atual = 1; // Sempre começa na rodada 1
+    chave->rodada_atual = 1;
 
     // Carregar confrontos
     FILE *f_confrontos = fopen("./dados/confrontos.csv", "r");
@@ -339,41 +353,70 @@ Chaveamento* carregar_chaveamento_ativo(TipoDesafio tipo) {
         fgets(linha, sizeof(linha), f_confrontos); // Cabeçalho
         
         while (fgets(linha, sizeof(linha), f_confrontos) && chave->num_confrontos < 32) {
-            Confronto *c = &chave->confrontos[chave->num_confrontos];
+            // Limpar a linha
+            linha[strcspn(linha, "\n")] = 0;
+            linha[strcspn(linha, "\r")] = 0;
             
-            // Parsing manual mais seguro
-            char *token = strtok(linha, ",");
+            // Parsing manual
+            char *token;
+            char *rest = linha;
+            
+            // ID_CONFRONTO
+            token = strtok_r(rest, ",", &rest);
             if (!token) continue;
-            c->id_confronto = atoi(token);
+            int id_confronto = atoi(token);
             
-            token = strtok(NULL, ",");
+            // ID_CHAVEAMENTO
+            token = strtok_r(rest, ",", &rest);
             if (!token) continue;
             int id_chave_confronto = atoi(token);
             
             // Só processar se pertencer ao chaveamento ativo
             if (id_chave_confronto == id_chaveamento_ativo) {
-                token = strtok(NULL, ",");
+                Confronto *c = &chave->confrontos[chave->num_confrontos];
+                c->id_confronto = id_confronto;
+                
+                // ID_EQUIPE1
+                token = strtok_r(rest, ",", &rest);
                 if (token) c->id_equipe1 = atoi(token);
                 
-                token = strtok(NULL, ",");
+                // ID_EQUIPE2
+                token = strtok_r(rest, ",", &rest);
                 if (token) c->id_equipe2 = atoi(token);
                 
-                token = strtok(NULL, ",");
-                if (token) strncpy(c->nome_equipe1, token, sizeof(c->nome_equipe1)-1);
+                // NOME_EQUIPE1
+                token = strtok_r(rest, ",", &rest);
+                if (token) {
+                    strncpy(c->nome_equipe1, token, sizeof(c->nome_equipe1)-1);
+                    c->nome_equipe1[sizeof(c->nome_equipe1)-1] = '\0';
+                }
                 
-                token = strtok(NULL, ",");
-                if (token) strncpy(c->nome_equipe2, token, sizeof(c->nome_equipe2)-1);
+                // NOME_EQUIPE2
+                token = strtok_r(rest, ",", &rest);
+                if (token) {
+                    strncpy(c->nome_equipe2, token, sizeof(c->nome_equipe2)-1);
+                    c->nome_equipe2[sizeof(c->nome_equipe2)-1] = '\0';
+                }
                 
-                token = strtok(NULL, ",");
+                // ID_VENCEDOR
+                token = strtok_r(rest, ",", &rest);
                 if (token) c->id_vencedor = atoi(token);
                 
-                token = strtok(NULL, ",");
+                // TEMPO_VENCEDOR
+                token = strtok_r(rest, ",", &rest);
                 if (token) c->tempo_vencedor = atof(token);
                 
-                token = strtok(NULL, ",");
-                if (token) c->rodada = atoi(token);
+                // RODADA
+                token = strtok_r(rest, ",", &rest);
+                if (token) {
+                    c->rodada = atoi(token);
+                    if (c->rodada > chave->rodada_atual) {
+                        chave->rodada_atual = c->rodada;
+                    }
+                }
                 
-                token = strtok(NULL, ",");
+                // STATUS
+                token = strtok_r(rest, ",", &rest);
                 if (token) c->status = atoi(token);
                 
                 chave->num_confrontos++;
